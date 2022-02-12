@@ -1,13 +1,9 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// Importing external resources,
-// on final deploy would be interesting to hardcode them
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
-// Importing own contracts
 import "./dexs/IDEX.sol";
 import "./dexs/UniswapDEX.sol";
 
