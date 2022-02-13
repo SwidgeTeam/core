@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./token/IERC20.sol";
-import "./libraries/TransferHelper.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "./dexs/IDEX.sol";
 import "./dexs/UniswapDEX.sol";
 
