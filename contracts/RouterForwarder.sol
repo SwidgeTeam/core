@@ -11,8 +11,7 @@ interface AnyswapRouter {
 }
 
 contract RouterForwarder {
-    using SafeERC20 for IERC20;
-    address private anyswapAddress;
+    AnyswapRouter private bridge;
     mapping(uint8 => IDEX) private swapProviders;
 
     enum dexCode {
@@ -32,7 +31,7 @@ contract RouterForwarder {
     /// Initialize bridge address
     /// @dev _anyswapRouterAddress Address of AnyswapRouter contract
     function initializeBridge(address _anyswapRouterAddress) internal {
-        anyswapAddress = _anyswapRouterAddress;
+        bridge = AnyswapRouter(_anyswapRouterAddress);
     }
 
     /// Initialize the mapping of DEX's that router has available in its network
@@ -74,19 +73,19 @@ contract RouterForwarder {
         // Take ownership of tokens from user
         TransferHelper.safeTransferFrom(_srcToken, msg.sender, address(this), _amount);
 
+        // If _srcToken is not a HL token for this swap provider, then make the swap TODO
         // Swap `srcToken` for a HL `crossToken` that can go through the bridge into a native token
-        // - The importance of using a HL token as a crossing one is that we want the bridge
-        // - to send us native tokens that we can immediately swap in a DEX for anything else
+        IDEX swapProvider = swapProviders[0];
+        TransferHelper.safeApprove(_srcToken, swapProvider.custodianAddress(), _amount);
         address crossToken = address(0); // USDC? Configurable from front?
-        uint256 crossAmount = 0; // Returned by swapProvider when swap is done
-        // ...
+        uint256 crossAmount = swapProvider.swap(_srcToken, crossToken, address(this), _amount);
 
         // Approve the bridge to take the tokens
-        TransferHelper.safeApprove(crossToken, anyswapAddress, crossAmount);
+        TransferHelper.safeApprove(crossToken, address(bridge), crossAmount);
 
         // Call bridge to cross-chain
         // We tell the bridge to move the tokens to our address on the other side
-        AnyswapRouter(anyswapAddress).anySwapOut(crossToken, address(this), crossAmount, _toChainId);
+        bridge.anySwapOut(crossToken, address(this), crossAmount, _toChainId);
 
         // Compute the calldata to be executed on the destination chain
         bytes memory data = abi.encodeWithSignature(
@@ -105,11 +104,10 @@ contract RouterForwarder {
 
     /// Finalize the process of swidging
     /// @dev This function is executed on the destination chain
-    /// @dev ¿Should only be executed by bridge or relayer?
     function finalizeTokenCross(address _crossToken, address _dstToken, address _to, uint256 _crossAmount, uint256 _toChainId) external {
-        require(_toChainId == block.chainid, "CROSS: Wrong destination call");
+        require(_toChainId == block.chainid, "Wrong destination call");
 
-        // Take ownership of token from bridge/proxy
+        // Take ownership of token
         TransferHelper.safeTransferFrom(_crossToken, msg.sender, address(this), _crossAmount);
 
         // Swap the received HL `crossToken` into the `dstToken` desired by the user
