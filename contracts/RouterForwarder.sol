@@ -69,13 +69,13 @@ contract RouterForwarder {
     /// @param _to Address of the user on the destination chain
     /// @param _amount Amount of source tokens that user wants to move
     /// @param _toChainId Chain identifier that the user wants its token to receive
-    function initTokensCross(address _srcToken, address _dstToken, address _to, uint256 _amount, uint256 _toChainId) external {
+    function initTokensCross(address _srcToken, address _dstToken, address _to, uint256 _amount, uint256 _toChainId, uint8 _srcDEX, uint8 _dstDEX) external {
         // Take ownership of tokens from user
         TransferHelper.safeTransferFrom(_srcToken, msg.sender, address(this), _amount);
 
         // If _srcToken is not a HL token for this swap provider, then make the swap TODO
         // Swap `srcToken` for a HL `crossToken` that can go through the bridge into a native token
-        IDEX swapProvider = swapProviders[0];
+        IDEX swapProvider = swapProviders[_srcDEX];
         TransferHelper.safeApprove(_srcToken, swapProvider.custodianAddress(), _amount);
         address crossToken = address(0); // USDC? Configurable from front?
         uint256 crossAmount = swapProvider.swap(_srcToken, crossToken, address(this), _amount);
@@ -89,12 +89,13 @@ contract RouterForwarder {
 
         // Compute the calldata to be executed on the destination chain
         bytes memory data = abi.encodeWithSignature(
-            "finalizeTokenCross(address, address, address, uint256, uint256)",
+            "finalizeTokenCross(address, address, address, uint256, uint256, unit8)",
             crossToken,
             _dstToken,
             _to,
             crossAmount,
-            _toChainId
+            _toChainId,
+            _dstDEX
         );
 
         // Now we either call to `anyCall` to execute a cross-chain function
@@ -104,15 +105,16 @@ contract RouterForwarder {
 
     /// Finalize the process of swidging
     /// @dev This function is executed on the destination chain
-    function finalizeTokenCross(address _crossToken, address _dstToken, address _to, uint256 _crossAmount, uint256 _toChainId) external {
+    function finalizeTokenCross(address _crossToken, address _dstToken, address _to, uint256 _crossAmount, uint256 _toChainId, uint8 _dstDEX) external {
         require(_toChainId == block.chainid, "Wrong destination call");
 
         // Take ownership of token
         TransferHelper.safeTransferFrom(_crossToken, msg.sender, address(this), _crossAmount);
 
         // Swap the received HL `crossToken` into the `dstToken` desired by the user
-        // If we want the user to decide which DEX is going to be used we will need to receive it through params
-        uint256 finalAmount = 0; // Returned by swapProvider when swap is done
+        IDEX swapProvider = swapProviders[_dstDEX];
+        TransferHelper.safeApprove(_crossToken, swapProvider.custodianAddress(), _crossAmount);
+        uint256 finalAmount = swapProvider.swap(_crossToken, _dstToken, address(this), _crossAmount);
 
         // Transfer `dstToken` to the user
         TransferHelper.safeTransfer(_dstToken, _to, finalAmount);
