@@ -1,9 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
+import "./token/IERC20.sol";
+import "./libraries/TransferHelper.sol";
 import "./dexs/IDEX.sol";
 import "./dexs/UniswapDEX.sol";
 
@@ -37,9 +36,9 @@ contract RouterForwarder {
     }
 
     /// Initialize the mapping of DEX's that router has available in its network
+    /// @dev codes and addresses need to be same length, otherwise we fail
     /// @param _dexAddresses Array of DEX addresses
     /// @param _dexCodes Array of DEX identifiers
-    /// @dev codes and addresses need to be same length, otherwise we fail
     function initializeDEXs(address[] memory _dexAddresses, dexCode[] memory _dexCodes) internal {
         require(_dexAddresses.length == _dexCodes.length, "INIT: Addresses count mismatch codes count.");
         require(_dexAddresses.length != 0, "INIT: No swap providers informed.");
@@ -50,9 +49,9 @@ contract RouterForwarder {
     }
 
     /// Construct and return the concrete DEX object given its code and address
+    /// @dev It returns an IDEX object so the router doesn't need to know the specifics
     /// @param _dexAddress The address of the DEX to be initialized
     /// @param _dexCode The code of the DEX we are initializing
-    /// @dev It returns an IDEX object so the router doesn't need to know the specifics
     function constructDEX(address _dexAddress, dexCode _dexCode) internal returns (IDEX){
         if (_dexCode == dexCode.Uniswap) {
             return new UniswapDEX(_dexAddress);
@@ -65,15 +64,15 @@ contract RouterForwarder {
     }
 
     /// Init the process of swidging
+    /// @dev This function is executed on the origin chain
     /// @param _srcToken Address of the source token the user wants to swidge
     /// @param _dstToken Address of the destination token the user wants to receive on destination
     /// @param _to Address of the user on the destination chain
     /// @param _amount Amount of source tokens that user wants to move
     /// @param _toChainId Chain identifier that the user wants its token to receive
-    /// @dev This function is executed on the origin chain
     function initTokensCross(address _srcToken, address _dstToken, address _to, uint256 _amount, uint256 _toChainId) external {
-        // Take ownership of tokens from user/proxy
-        IERC20(_srcToken).safeTransferFrom(msg.sender, address(this), _amount);
+        // Take ownership of tokens from user
+        TransferHelper.safeTransferFrom(_srcToken, msg.sender, address(this), _amount);
 
         // Swap `srcToken` for a HL `crossToken` that can go through the bridge into a native token
         // - The importance of using a HL token as a crossing one is that we want the bridge
@@ -83,7 +82,7 @@ contract RouterForwarder {
         // ...
 
         // Approve the bridge to take the tokens
-        IERC20(crossToken).approve(anyswapAddress, crossAmount);
+        TransferHelper.safeApprove(crossToken, anyswapAddress, crossAmount);
 
         // Call bridge to cross-chain
         // We tell the bridge to move the tokens to our address on the other side
@@ -111,14 +110,14 @@ contract RouterForwarder {
         require(_toChainId == block.chainid, "CROSS: Wrong destination call");
 
         // Take ownership of token from bridge/proxy
-        IERC20(_crossToken).safeTransferFrom(msg.sender, address(this), _crossAmount);
+        TransferHelper.safeTransferFrom(_crossToken, msg.sender, address(this), _crossAmount);
 
         // Swap the received HL `crossToken` into the `dstToken` desired by the user
         // If we want the user to decide which DEX is going to be used we will need to receive it through params
         uint256 finalAmount = 0; // Returned by swapProvider when swap is done
 
         // Transfer `dstToken` to the user
-        IERC20(_dstToken).transfer(_to, finalAmount);
+        TransferHelper.safeTransfer(_dstToken, _to, finalAmount);
     }
 
 }
