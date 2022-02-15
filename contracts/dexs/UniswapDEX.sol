@@ -33,7 +33,7 @@ contract UniswapDEX is IDEX {
             recipient : _recipient,
             deadline : block.timestamp,
             amountIn : _amountIn,
-            amountOutMinimum : 0,
+            amountOutMinimum : 0, // TODO : needs to be either be asked to oracle or passed as parameter
             sqrtPriceLimitX96 : 0
         });
 

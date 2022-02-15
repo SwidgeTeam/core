@@ -38,9 +38,9 @@ contract RouterForwarder {
     /// @dev codes and addresses need to be same length, otherwise we fail
     /// @param _dexAddresses Array of DEX addresses
     /// @param _dexCodes Array of DEX identifiers
-    function initializeDEXs(address[] memory _dexAddresses, dexCode[] memory _dexCodes) internal {
-        require(_dexAddresses.length == _dexCodes.length, "INIT: Addresses count mismatch codes count.");
-        require(_dexAddresses.length != 0, "INIT: No swap providers informed.");
+    function initializeDEXs(address[] memory _dexAddresses, dexCode[] memory _dexCodes) private {
+        require(_dexAddresses.length == _dexCodes.length, "Addresses count cannot mismatch codes count.");
+        require(_dexAddresses.length != 0, "No swap providers informed.");
         for (uint8 i = 0; i < _dexAddresses.length; i++) {
             IDEX provider = constructDEX(_dexAddresses[i], _dexCodes[i]);
             swapProviders[uint8(_dexCodes[i])] = provider;
@@ -51,14 +51,12 @@ contract RouterForwarder {
     /// @dev It returns an IDEX object so the router doesn't need to know the specifics
     /// @param _dexAddress The address of the DEX to be initialized
     /// @param _dexCode The code of the DEX we are initializing
-    function constructDEX(address _dexAddress, dexCode _dexCode) internal returns (IDEX){
+    function constructDEX(address _dexAddress, dexCode _dexCode) private returns (IDEX){
         if (_dexCode == dexCode.Uniswap) {
             return new UniswapDEX(_dexAddress);
         }
         else {
-            // Just for safety, but code won't reach here
-            // since Solidity performs value-checking on enums parameters
-            revert("INIT: Given `dexCode` was not found.");
+            revert("Given `dexCode` implementation was not found.");
         }
     }
 
@@ -66,10 +64,16 @@ contract RouterForwarder {
     /// @dev This function is executed on the origin chain
     /// @param _srcToken Address of the source token the user wants to swidge
     /// @param _dstToken Address of the destination token the user wants to receive on destination
-    /// @param _to Address of the user on the destination chain
     /// @param _amount Amount of source tokens that user wants to move
     /// @param _toChainId Chain identifier that the user wants its token to receive
-    function initTokensCross(address _srcToken, address _dstToken, address _to, uint256 _amount, uint256 _toChainId, uint8 _srcDEX, uint8 _dstDEX) external {
+    function initTokensCross(
+        address _srcToken,
+        address _dstToken,
+        uint256 _amount,
+        uint256 _toChainId,
+        uint8 _srcDEX,
+        uint8 _dstDEX
+    ) external {
         // Take ownership of tokens from user
         TransferHelper.safeTransferFrom(_srcToken, msg.sender, address(this), _amount);
 
@@ -77,7 +81,8 @@ contract RouterForwarder {
         // Swap `srcToken` for a HL `crossToken` that can go through the bridge into a native token
         IDEX swapProvider = swapProviders[_srcDEX];
         TransferHelper.safeApprove(_srcToken, swapProvider.custodianAddress(), _amount);
-        address crossToken = address(0); // USDC? Configurable from front?
+        address crossToken = address(0);
+        // USDC? Configurable from front?
         uint256 crossAmount = swapProvider.swap(_srcToken, crossToken, address(this), _amount);
 
         // Approve the bridge to take the tokens
@@ -92,7 +97,7 @@ contract RouterForwarder {
             "finalizeTokenCross(address, address, address, uint256, uint256, unit8)",
             crossToken,
             _dstToken,
-            _to,
+            msg.sender,
             crossAmount,
             _toChainId,
             _dstDEX

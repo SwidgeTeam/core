@@ -12,17 +12,17 @@ describe("Router", function () {
         const [bridge, dex1] = await ethers.getSigners();
 
         await expect(RouterFactory.deploy(bridge.address, [dex1.address], []))
-            .to.be.revertedWith('INIT: Addresses count mismatch codes count.');
+            .to.be.reverted;
 
         await expect(RouterFactory.deploy(bridge.address, [dex1.address], [0, 0]))
-            .to.be.revertedWith('INIT: Addresses count mismatch codes count.');
+            .to.be.reverted;
     });
 
     it("Should fail if no DEX data is informed", async function () {
         const [bridge, dex1] = await ethers.getSigners();
 
         await expect(RouterFactory.deploy(bridge.address, [], []))
-            .to.be.revertedWith('INIT: No swap providers informed.');
+            .to.be.reverted;
     });
 
     it("Should fail if DEX code is unknown", async function () {
