@@ -7,7 +7,7 @@ import "./dexs/IDEX.sol";
 import "./dexs/UniswapDEX.sol";
 
 interface AnyswapRouter {
-    function anySwapOut(address token, address to, uint amount, uint toChainID) external;
+    function anySwapOutUnderlying(address token, address to, uint amount, uint toChainID) external;
 }
 
 contract RouterForwarder {
@@ -93,7 +93,7 @@ contract RouterForwarder {
 
         // Call bridge to cross-chain
         // We tell the bridge to move the tokens to our address on the other side
-        bridge.anySwapOut(_srcCrossToken, address(this), crossAmount, _toChainId);
+        bridge.anySwapOutUnderlying(_srcCrossToken, address(this), crossAmount, _toChainId);
 
         // Compute the calldata to be executed on the destination chain
         bytes memory data = abi.encodeWithSignature(
@@ -116,12 +116,9 @@ contract RouterForwarder {
     function finalizeTokenCross(address _dstCrossToken, address _dstToken, address _to, uint256 _crossAmount, uint256 _toChainId, uint8 _dstDEX) external {
         require(_toChainId == block.chainid, "Wrong destination call");
 
-        // Take ownership of token
-        TransferHelper.safeTransferFrom(_dstCrossToken, msg.sender, address(this), _crossAmount);
-
         // Swap the received `dstCrossToken` into the `dstToken` desired by the user
         IDEX swapProvider = swapProviders[_dstDEX];
-        TransferHelper.safeApprove(_crossToken, swapProvider.custodianAddress(), _crossAmount);
+        TransferHelper.safeApprove(_dstCrossToken, swapProvider.custodianAddress(), _crossAmount);
         uint256 finalAmount = swapProvider.swap(_dstCrossToken, _dstToken, address(this), _crossAmount);
 
         // Transfer `dstToken` to the user
