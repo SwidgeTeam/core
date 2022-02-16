@@ -27,6 +27,16 @@ const config: HardhatUserConfig = {
             live: false,
             saveDeployments: true,
         },
+        rinkeby: {
+            url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
+            accounts,
+            chainId: 4,
+            live: true,
+            saveDeployments: true,
+            tags: ["staging"],
+            gasPrice: 5000000000,
+            gasMultiplier: 2,
+        },
     }
 };
 
