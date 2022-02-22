@@ -14,6 +14,7 @@ type Bridges = BridgeDetails[];
 type Swappers = ExchangeDetails[];
 
 interface ChainAddresses {
+    name: string
     chainId: any
     bridges: Bridges
     swappers: Swappers
