@@ -25,7 +25,12 @@ const config: HardhatUserConfig = {
                 url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
             },
             live: false,
-            saveDeployments: true,
+            saveDeployments: false,
+        },
+        localhost: {
+            url: 'http://127.0.0.1:8545',
+            live: false,
+            saveDeployments: false,
         },
         ropsten: {
             url: `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`,

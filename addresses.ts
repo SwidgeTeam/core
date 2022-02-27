@@ -1,5 +1,6 @@
 const addresses = [
     {
+        name: "hardhat",
         chainId: 31337,
         bridges: [
             {
@@ -16,6 +17,7 @@ const addresses = [
         ]
     },
     {
+        name: "rinkeby",
         chainId: 4,
         bridges: [
             {
