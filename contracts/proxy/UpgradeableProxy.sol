@@ -40,13 +40,14 @@ contract UpgradeableProxy is Proxy {
      */
     constructor(
         address _logic,
-        address admin_
+        address _admin
     ) payable {
         assert(_IMPLEMENTATION_SLOT == bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1));
         assert(_ADMIN_SLOT == bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1));
         _setImplementation(_logic);
-        _changeAdmin(admin_);
+        _changeAdmin(_admin);
     }
+
     /**
      * @dev Modifier used internally that will delegate the call to the implementation unless the sender is the admin.
      */
@@ -101,25 +102,7 @@ contract UpgradeableProxy is Proxy {
      * NOTE: Only the admin can call this function. See {ProxyAdmin-upgrade}.
      */
     function upgradeTo(address newImplementation) external ifAdmin {
-        _upgradeToAndCall(newImplementation, bytes(""), false);
-    }
-
-    /**
-     * @dev Upgrade the implementation of the proxy, and then call a function from the new implementation as specified
-     * by `data`, which should be an encoded function call. This is useful to initialize new storage variables in the
-     * proxied contract.
-     *
-     * NOTE: Only the admin can call this function. See {ProxyAdmin-upgradeAndCall}.
-     */
-    function upgradeToAndCall(address newImplementation, bytes calldata data) external payable ifAdmin {
-        _upgradeToAndCall(newImplementation, data, true);
-    }
-
-    /**
-     * @dev Returns the current admin.
-     */
-    function _admin() internal view virtual returns (address) {
-        return _getAdmin();
+        _upgradeTo(newImplementation);
     }
 
     /**
@@ -131,16 +114,16 @@ contract UpgradeableProxy is Proxy {
     }
 
     /**
-     * @dev Emitted when the implementation is upgraded.
-     */
-    event Upgraded(address indexed implementation);
-
-    /**
      * @dev Storage slot with the address of the current implementation.
      * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is
      * validated in the constructor.
      */
     bytes32 private constant _IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+
+    /**
+     * @dev Emitted when the implementation is upgraded.
+     */
+    event Upgraded(address indexed implementation);
 
     /**
      * @dev Returns the current implementation address.
@@ -161,22 +144,6 @@ contract UpgradeableProxy is Proxy {
     function _upgradeTo(address newImplementation) internal {
         _setImplementation(newImplementation);
         emit Upgraded(newImplementation);
-    }
-
-    /**
-     * @dev Perform implementation upgrade with additional setup call.
-     *
-     * Emits an {Upgraded} event.
-     */
-    function _upgradeToAndCall(
-        address newImplementation,
-        bytes memory data,
-        bool forceCall
-    ) internal {
-        _upgradeTo(newImplementation);
-        if (data.length > 0 || forceCall) {
-            Address.functionDelegateCall(newImplementation, data);
-        }
     }
 
     /**

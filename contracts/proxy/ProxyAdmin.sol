@@ -62,20 +62,4 @@ contract ProxyAdmin is Ownable {
     function upgrade(UpgradeableProxy proxy, address implementation) public virtual onlyOwner {
         proxy.upgradeTo(implementation);
     }
-
-    /**
-     * @dev Upgrades `proxy` to `implementation` and calls a function on the new implementation. See
-     * {UpgradeableProxy-upgradeToAndCall}.
-     *
-     * Requirements:
-     *
-     * - This contract must be the admin of `proxy`.
-     */
-    function upgradeAndCall(
-        UpgradeableProxy proxy,
-        address implementation,
-        bytes memory data
-    ) public payable virtual onlyOwner {
-        proxy.upgradeToAndCall{value: msg.value}(implementation, data);
-    }
 }
