@@ -1,6 +1,7 @@
 {
   "license": "MIT",
   "scripts": {
+    "up": "hardhat node",
     "build": "hardhat compile",
     "deploy:ropsten": "hardhat --network ropsten deploy",
     "deploy:rinkeby": "hardhat --network rinkeby deploy",

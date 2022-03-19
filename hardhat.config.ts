@@ -16,6 +16,9 @@ const config: HardhatUserConfig = {
         deployer: {
             default: 0,
         },
+        admin: {
+            default: 1,
+        },
     },
     defaultNetwork: "hardhat",
     networks: {
