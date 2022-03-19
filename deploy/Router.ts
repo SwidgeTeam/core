@@ -9,7 +9,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     const {deployer} = await getNamedAccounts();
 
-    await deploy('RouterForwarder', {
+    await deploy('Router', {
         from: deployer,
         args: [
             addresses.getBridge(),

@@ -10,7 +10,7 @@ interface AnyswapRouter {
     function anySwapOutUnderlying(address token, address to, uint amount, uint toChainID) external;
 }
 
-contract RouterForwarder {
+contract Router {
     AnyswapRouter private bridge;
     mapping(uint8 => IDEX) private swapProviders;
 
@@ -77,6 +77,7 @@ contract RouterForwarder {
         address _dstToken,
         uint256 _srcAmount,
         uint256 _toChainId,
+        uint8 _bridge,
         uint8 _srcDEX,
         uint8 _dstDEX
     ) external {
@@ -97,13 +98,14 @@ contract RouterForwarder {
 
         // Compute the calldata to be executed on the destination chain
         bytes memory data = abi.encodeWithSignature(
-            "finalizeTokenCross(address, address, address, uint256, uint256, unit8)",
+            "finalizeTokenCross(address, address, address, uint256, uint256, unit8, unit8)",
             _dstCrossToken,
             _dstToken,
             msg.sender,
             crossAmount,
             _toChainId,
-            _dstDEX
+            _dstDEX,
+            _bridge
         );
 
         // Now we either call to `anyCall` to execute a cross-chain function
