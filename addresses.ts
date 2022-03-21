@@ -3,8 +3,8 @@ const addresses = [
         name: "hardhat",
         chainId: 31337,
         proxyAdmin: '0x8464135c8F25Da09e49BC8782676a84730C318bC',
-        router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
         routerProxy: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
+        router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
         bridges: [
             {
                 name: 'anyswap',
@@ -23,8 +23,8 @@ const addresses = [
         name: "localhost",
         chainId: undefined,
         proxyAdmin: '0x8464135c8F25Da09e49BC8782676a84730C318bC',
-        router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
         routerProxy: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
+        router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
         bridges: [
             {
                 name: 'anyswap',
@@ -43,8 +43,8 @@ const addresses = [
         name: "rinkeby",
         chainId: 4,
         proxyAdmin: '0x8464135c8F25Da09e49BC8782676a84730C318bC',
-        router: '',
-        routerProxy: '',
+        routerProxy: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
+        router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
         bridges: [
             {
                 name: 'anyswap',

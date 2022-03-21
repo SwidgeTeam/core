@@ -1,18 +1,16 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
+import {getChainAddresses} from "../scripts/addresses";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-    const {deployments, getNamedAccounts} = hre;
+    const {deployments, getNamedAccounts, network} = hre;
     const {deploy} = deployments;
-
+    const addresses = getChainAddresses(<any>network.config.chainId);
     const {deployer} = await getNamedAccounts();
-
-    const address_logic = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
-    const address_admin = '0x8464135c8F25Da09e49BC8782676a84730C318bC';
 
     await deploy('UpgradeableProxy', {
         from: deployer,
-        args: [address_logic, address_admin],
+        args: [addresses.router, addresses.proxyAdmin],
         log: true,
     });
 
