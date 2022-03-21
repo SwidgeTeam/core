@@ -16,6 +16,9 @@ type Swappers = ExchangeDetails[];
 interface ChainAddresses {
     name: string
     chainId: any
+    proxyAdmin: string
+    router: string
+    routerProxy: string
     bridges: Bridges
     swappers: Swappers
 }
@@ -52,6 +55,18 @@ class Addresses {
         return this.data.swappers.map(swapper => {
             return swapper.code;
         });
+    }
+
+    get proxyAdmin(): string {
+        return this.data.proxyAdmin;
+    }
+
+    get router(): string {
+        return this.data.router;
+    }
+
+    get routerProxy(): string {
+        return this.data.routerProxy;
     }
 
 }

@@ -3,10 +3,12 @@
   "scripts": {
     "up": "hardhat node",
     "build": "hardhat compile",
+    "deploy:local": "hardhat --network localhost deploy",
     "deploy:ropsten": "hardhat --network ropsten deploy",
     "deploy:rinkeby": "hardhat --network rinkeby deploy",
     "deploy:goerli": "hardhat --network goerli deploy",
-    "deploy:kovam": "hardhat --network kovan deploy"
+    "deploy:kovam": "hardhat --network kovan deploy",
+    "update-proxy:local": "hardhat --network localhost update-proxy"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",
