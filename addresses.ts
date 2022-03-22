@@ -59,6 +59,26 @@ const addresses = [
             },
         ]
     },
+    {
+        name: "polygon",
+        chainId: 137,
+        proxyAdmin: '0x8464135c8F25Da09e49BC8782676a84730C318bC',
+        routerProxy: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
+        router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
+        bridges: [
+            {
+                name: 'anyswap',
+                address: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
+            }
+        ],
+        swappers: [
+            {
+                name: 'uni',
+                code: 0,
+                address: '0xE592427A0AEce92De3Edee1F18E0157C05861564'
+            },
+        ]
+    },
 ];
 
 export default addresses;

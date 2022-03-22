@@ -80,6 +80,21 @@ const config: HardhatUserConfig = {
             tags: ["staging"],
             gasMultiplier: 2,
         },
+        matic: {
+            url: "https://rpc-mainnet.maticvigil.com",
+            accounts,
+            chainId: 137,
+            live: true,
+            saveDeployments: true,
+        },
+        mumbai: {
+            url: "https://rpc-mumbai.maticvigil.com/",
+            accounts,
+            chainId: 80001,
+            live: true,
+            saveDeployments: true,
+            gasMultiplier: 2,
+        },
     }
 };
 
