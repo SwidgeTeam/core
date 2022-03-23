@@ -1,25 +1,25 @@
 
+-include .make.cfg
+
+TEMP_ENV_FILE := $(shell mktemp -t ".env.XXXXXX")
+
+$(shell echo -n "COMMANDS=" > ${TEMP_ENV_FILE})
+
+$(foreach net, ${NETWORKS}, $(eval _ := $(shell \
+    $(foreach contract, ${CONTRACTS}, $(eval _ := $(shell \
+        echo -n "${net}.${contract} " \
+        >> ${TEMP_ENV_FILE} \
+    ))) \
+)))
+
+-include ${TEMP_ENV_FILE}
+
+REMOVE_TEMP_ENV_FILE := $(shell unlink ${TEMP_ENV_FILE})
+
 .PHONY: deploy
 
-DEPLOY = npx hardhat --network $(1) deploy --tags $(2)
+HARDHAT = npx hardhat
+DEPLOY = ${HARDHAT} --network $(1) deploy --tags $(2)
 
-deploy-mumbai-router:
-	@$(call DEPLOY, mumbai, router)
-
-deploy-mumbai-proxy-admin:
-	@$(call DEPLOY, mumbai, proxy-admin)
-
-deploy-mumbai-proxy:
-	@$(call DEPLOY, mumbai, proxy)
-
-deploy-matic-router:
-	@$(call DEPLOY, matic, router)
-
-deploy-matic-proxy-admin:
-	@$(call DEPLOY, matic, proxy-admin)
-
-deploy-matic-proxy:
-	@$(call DEPLOY, matic, proxy)
-
-deploy:
-	@$(call DEPLOY, ${NET}, ${TAG})
+$(addprefix deploy., ${COMMANDS}): deploy.%:
+	@$(call DEPLOY,$(shell echo $* | cut -d'.' -f 1),$(shell echo $* | cut -d'.' -f 2))
