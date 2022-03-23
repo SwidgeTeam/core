@@ -79,6 +79,26 @@ const addresses = [
             },
         ]
     },
+    {
+        name: "mumbai",
+        chainId: 80001,
+        proxyAdmin: '0xB53FE327A78A88BdB89f99e82BDbb741311c15F8',
+        routerProxy: '0xdd700e687d8b9482fF012e91894B7d0A69A279ce',
+        router: '0x698ef266230cD82BeD2E1f4Fdf3d53382499D93E',
+        bridges: [
+            {
+                name: 'anyswap',
+                address: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
+            }
+        ],
+        swappers: [
+            {
+                name: 'uni',
+                code: 0,
+                address: '0xE592427A0AEce92De3Edee1F18E0157C05861564'
+            },
+        ]
+    },
 ];
 
 export default addresses;
