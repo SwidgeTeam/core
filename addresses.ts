@@ -24,7 +24,7 @@ const addresses = [
         chainId: undefined,
         proxyAdmin: '0x8464135c8F25Da09e49BC8782676a84730C318bC',
         routerProxy: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
-        router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
+        router: '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853',
         bridges: [
             {
                 name: 'anyswap',
@@ -60,11 +60,11 @@ const addresses = [
         ]
     },
     {
-        name: "polygon",
+        name: "matic",
         chainId: 137,
-        proxyAdmin: '0x8464135c8F25Da09e49BC8782676a84730C318bC',
-        routerProxy: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
-        router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
+        proxyAdmin: '0xB53FE327A78A88BdB89f99e82BDbb741311c15F8',
+        routerProxy: '0xdd700e687d8b9482fF012e91894B7d0A69A279ce',
+        router: '0x698ef266230cD82BeD2E1f4Fdf3d53382499D93E',
         bridges: [
             {
                 name: 'anyswap',
