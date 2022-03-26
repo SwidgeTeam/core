@@ -64,7 +64,7 @@ const addresses = [
         chainId: 137,
         proxyAdmin: '0xB53FE327A78A88BdB89f99e82BDbb741311c15F8',
         routerProxy: '0xdd700e687d8b9482fF012e91894B7d0A69A279ce',
-        router: '0x698ef266230cD82BeD2E1f4Fdf3d53382499D93E',
+        router: '0x2735bdb20dcE676273D2d74e9d87263677fCaaD4',
         bridges: [
             {
                 name: 'anyswap',

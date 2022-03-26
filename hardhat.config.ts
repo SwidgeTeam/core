@@ -2,6 +2,7 @@ import "dotenv/config"
 import "@nomiclabs/hardhat-waffle";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
+import "@nomiclabs/hardhat-web3";
 import "./tasks/index"
 
 import {HardhatUserConfig} from "hardhat/types"
@@ -18,6 +19,9 @@ const config: HardhatUserConfig = {
         },
         admin: {
             default: 1,
+        },
+        user: {
+            default: 2,
         },
     },
     defaultNetwork: "hardhat",
@@ -86,6 +90,7 @@ const config: HardhatUserConfig = {
             chainId: 137,
             live: true,
             saveDeployments: true,
+            gasMultiplier: 4,
         },
         mumbai: {
             url: "https://rpc-mumbai.maticvigil.com/",
