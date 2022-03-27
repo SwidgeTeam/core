@@ -14,19 +14,31 @@ async function main() {
     // Get deployed contract addresses
     const addresses = getChainAddresses(hre.network.config.chainId);
 
+    const tokens = {
+        USDC: {
+            address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+            anyToken: '0xd69b31c3225728cc57ddaf9be532a4ee1620be51',
+            decimals: 6
+        },
+        LINK: {
+            address: '0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39',
+            decimals: 18
+        },
+    };
+
     // Define function parameters
-    const _srcToken = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'; // LINK
-    const _srcCrossToken = '0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39'; // USDC
+    const _srcToken = tokens.USDC;
+    const _srcCrossToken = tokens.LINK;
     const _dstCrossToken = '0x0000000000000000000000000000000000000000'; // unused
     const _dstToken = '0x0000000000000000000000000000000000000000'; // unused
-    const _srcAmount = ethers.utils.parseUnits('0.8');
-    const _toChainId = 0; // unused
+    const _srcAmount = ethers.utils.parseUnits('16', _srcToken.decimals);
+    const _toChainId = 56; // BSC
     const _bridge = 0; // unused
     const _srcDEX = 0;
     const _dstDEX = 0; // unused
 
     // Approve user token to be taken by the router
-    await approveTokens(_srcToken, addresses.router, _srcAmount, user);
+    await approveTokens(_srcToken.address, addresses.router, _srcAmount, user);
 
     console.log('Tokens approved');
 
@@ -91,10 +103,14 @@ async function main() {
         user
     );
 
+    const feeData = await Router.provider.getFeeData();
+
+    console.log(feeData);
+
     // Execute function
     const tx = await Router.initTokensCross(
-        _srcToken,
-        _srcCrossToken,
+        _srcToken.address,
+        _srcCrossToken.address,
         _dstCrossToken,
         _dstToken,
         _srcAmount,

@@ -12,7 +12,16 @@ const accounts = {
 }
 
 const config: HardhatUserConfig = {
-    solidity: "0.8.1",
+    solidity: {
+        compilers: [
+            {
+                version: "0.8.1",
+            },
+            {
+                version: "0.7.6",
+            }
+        ]
+    },
     namedAccounts: {
         deployer: {
             default: 0,

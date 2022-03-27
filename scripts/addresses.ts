@@ -10,8 +10,7 @@ export function getChainAddresses(chainId: any): Addresses {
     return new Addresses(result);
 }
 
-type Bridges = BridgeDetails[];
-type Swappers = ExchangeDetails[];
+export type ChainsAddresses = ChainAddresses[];
 
 interface ChainAddresses {
     name: string
@@ -20,12 +19,22 @@ interface ChainAddresses {
     router: string
     routerProxy: string
     bridges: Bridges
-    swappers: Swappers
+    swapImplementations: Swappers
+    exchanges: Exchanges
+}
+
+type Bridges = BridgeDetails[];
+type Swappers = SwapperDetails[];
+type Exchanges = ExchangeDetails[];
+
+interface SwapperDetails {
+    code: number
+    name: string
+    address: string
 }
 
 interface ExchangeDetails {
     name: string
-    code: number
     address: string
 }
 
@@ -41,20 +50,27 @@ class Addresses {
         this.data = _data;
     }
 
-    public getBridge(): string {
+    get getBridge(): string {
         return this.data.bridges[0].address;
     }
 
-    public getSwappersAddresses(): string[] {
-        return this.data.swappers.map(swapper => {
+    get getSwapperImplAddresses(): string[] {
+        return this.data.swapImplementations.map(swapper => {
             return swapper.address;
         });
     }
 
-    public getSwappersCodes(): number[] {
-        return this.data.swappers.map(swapper => {
+    get getSwapperImplCodes(): number[] {
+        return this.data.swapImplementations.map(swapper => {
             return swapper.code;
         });
+    }
+
+    public getExchangeAddress(name: string): string {
+        const exchange = this.data.exchanges.find(exchange => {
+            return exchange.name === name;
+        });
+        return exchange ? exchange.address : '';
     }
 
     get proxyAdmin(): string {

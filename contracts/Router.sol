@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "./dexs/IDEX.sol";
-import "./dexs/UniswapDEX.sol";
 
 interface AnyswapRouter {
     function anySwapOutUnderlying(address token, address to, uint amount, uint toChainID) external;
@@ -42,21 +41,8 @@ contract Router {
         require(_dexAddresses.length == _dexCodes.length, "Addresses count cannot mismatch codes count.");
         require(_dexAddresses.length != 0, "No swap providers informed.");
         for (uint8 i = 0; i < _dexAddresses.length; i++) {
-            IDEX provider = constructDEX(_dexAddresses[i], _dexCodes[i]);
+            IDEX provider = IDEX(_dexAddresses[i]);
             swapProviders[uint8(_dexCodes[i])] = provider;
-        }
-    }
-
-    /// Construct and return the concrete DEX object given its code and address
-    /// @dev It returns an IDEX object so the router doesn't need to know the specifics
-    /// @param _dexAddress The address of the DEX to be initialized
-    /// @param _dexCode The code of the DEX we are initializing
-    function constructDEX(address _dexAddress, dexCode _dexCode) private returns (IDEX){
-        if (_dexCode == dexCode.Uniswap) {
-            return new UniswapDEX(_dexAddress);
-        }
-        else {
-            revert("Given `dexCode` implementation was not found.");
         }
     }
 
@@ -81,50 +67,29 @@ contract Router {
         uint8 _srcDEX,
         uint8 _dstDEX
     ) external {
-        // Take ownership of tokens from user
+        // Take ownership of user's tokens
         TransferHelper.safeTransferFrom(_srcToken, msg.sender, address(this), _srcAmount);
 
-        // Swap `srcToken` for a `dstCrossToken` that can go through the bridge into a native token
+        // Load selected swap provider
         IDEX swapProvider = swapProviders[_srcDEX];
-        TransferHelper.safeApprove(_srcToken, swapProvider.custodianAddress(), _srcAmount);
-        uint256 crossAmount = swapProvider.swap(_srcToken, _srcCrossToken, address(this), _srcAmount);
 
-        // Approve the bridge to take the tokens
-        TransferHelper.safeApprove(_srcCrossToken, address(bridge), crossAmount);
+        // Approve tokens for provider to take
+        TransferHelper.safeApprove(_srcToken, address(swapProvider), _srcAmount);
 
-        // Call bridge to cross-chain
-        // We tell the bridge to move the tokens to our address on the other side
-        bridge.anySwapOutUnderlying(_srcCrossToken, address(this), crossAmount, _toChainId);
+        // Execute swap
+        uint256 amountOut = swapProvider.swap(_srcToken, _srcCrossToken, address(this), _srcAmount);
 
-        // Compute the calldata to be executed on the destination chain
-        bytes memory data = abi.encodeWithSignature(
-            "finalizeTokenCross(address, address, address, uint256, uint256, unit8, unit8)",
-            _dstCrossToken,
-            _dstToken,
-            msg.sender,
-            crossAmount,
-            _toChainId,
-            _dstDEX,
-            _bridge
-        );
-
-        // Now we either call to `anyCall` to execute a cross-chain function
-        // or emit an event so a relayer can execute the swap on the other side when funds are ready
-        // ...
+        // Transfer final tokens to the user
+        TransferHelper.safeTransfer(_srcCrossToken, msg.sender, amountOut);
     }
 
     /// Finalize the process of swidging
-    /// @dev This function is executed on the destination chain
     function finalizeTokenCross(address _dstCrossToken, address _dstToken, address _to, uint256 _crossAmount, uint256 _toChainId, uint8 _dstDEX) external {
-        require(_toChainId == block.chainid, "Wrong destination call");
 
-        // Swap the received `dstCrossToken` into the `dstToken` desired by the user
-        IDEX swapProvider = swapProviders[_dstDEX];
-        TransferHelper.safeApprove(_dstCrossToken, swapProvider.custodianAddress(), _crossAmount);
-        uint256 finalAmount = swapProvider.swap(_dstCrossToken, _dstToken, address(this), _crossAmount);
-
-        // Transfer `dstToken` to the user
-        TransferHelper.safeTransfer(_dstToken, _to, finalAmount);
     }
 
+    /// To retrieve any tokens that got stuck on the contract
+    function retrieve(address _token, uint256 _amount) external {
+        TransferHelper.safeTransfer(_token, msg.sender, _amount);
+    }
 }

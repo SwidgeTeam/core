@@ -9,16 +9,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     const {deployer} = await getNamedAccounts();
 
-    await deploy('Router', {
+    await deploy('Uniswap', {
         from: deployer,
         args: [
-            addresses.getBridge,
-            addresses.getSwapperImplAddresses,
-            addresses.getSwapperImplCodes
+            addresses.getExchangeAddress('uniswap')
         ],
         log: true,
     });
 
 };
 export default func;
-func.tags = ["router"]
+func.tags = ["uniswap"]
