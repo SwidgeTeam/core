@@ -4,18 +4,20 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "./dexs/IDEX.sol";
-
-interface AnyswapRouter {
-    function anySwapOutUnderlying(address token, address to, uint amount, uint toChainID) external;
-}
+import "./bridge/IBridge.sol";
 
 contract Router {
-    AnyswapRouter private bridge;
     mapping(uint8 => IDEX) private swapProviders;
+    mapping(uint8 => IBridge) private bridgeProviders;
 
     enum dexCode {
         Uniswap, // 0
         Sushiswap // 1
+        // ...
+    }
+
+    enum bridgeCode {
+        Anyswap // 0
         // ...
     }
 
@@ -30,7 +32,7 @@ contract Router {
     /// Initialize bridge address
     /// @dev _anyswapRouterAddress Address of AnyswapRouter contract
     function initializeBridge(address _anyswapRouterAddress) internal {
-        bridge = AnyswapRouter(_anyswapRouterAddress);
+        bridgeProviders[uint8(bridgeCode.Anyswap)] = IBridge(_anyswapRouterAddress);
     }
 
     /// Initialize the mapping of DEX's that router has available in its network
@@ -70,17 +72,13 @@ contract Router {
         // Take ownership of user's tokens
         TransferHelper.safeTransferFrom(_srcToken, msg.sender, address(this), _srcAmount);
 
-        // Load selected swap provider
-        IDEX swapProvider = swapProviders[_srcDEX];
+        IBridge bridge = bridgeProviders[_bridge];
 
-        // Approve tokens for provider to take
-        TransferHelper.safeApprove(_srcToken, address(swapProvider), _srcAmount);
+        // Approve tokens for the bridge to take
+        TransferHelper.safeApprove(_srcToken, address(bridge), _srcAmount);
 
-        // Execute swap
-        uint256 amountOut = swapProvider.swap(_srcToken, _srcCrossToken, address(this), _srcAmount);
-
-        // Transfer final tokens to the user
-        TransferHelper.safeTransfer(_srcCrossToken, msg.sender, amountOut);
+        // Execute bridge process
+        bridge.send(_srcCrossToken, _srcToken, msg.sender, _srcAmount, _toChainId);
     }
 
     /// Finalize the process of swidging

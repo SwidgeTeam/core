@@ -18,14 +18,22 @@ interface ChainAddresses {
     proxyAdmin: string
     router: string
     routerProxy: string
+    bridgeImplementations: Bridgers
     bridges: Bridges
     swapImplementations: Swappers
     exchanges: Exchanges
 }
 
+type Bridgers = BridgerDetails[];
 type Bridges = BridgeDetails[];
 type Swappers = SwapperDetails[];
 type Exchanges = ExchangeDetails[];
+
+interface BridgerDetails {
+    code: number
+    name: string
+    address: string
+}
 
 interface SwapperDetails {
     code: number
@@ -50,8 +58,10 @@ class Addresses {
         this.data = _data;
     }
 
-    get getBridge(): string {
-        return this.data.bridges[0].address;
+    /* Own implementations */
+
+    get getBridgeImpl(): string {
+        return this.data.bridgeImplementations[0].address;
     }
 
     get getSwapperImplAddresses(): string[] {
@@ -66,11 +76,20 @@ class Addresses {
         });
     }
 
+    /* External contracts */
+
     public getExchangeAddress(name: string): string {
         const exchange = this.data.exchanges.find(exchange => {
             return exchange.name === name;
         });
         return exchange ? exchange.address : '';
+    }
+
+    public getBridgeAddress(name: string): string {
+        const bridge = this.data.bridges.find(bridge => {
+            return bridge.name === name;
+        });
+        return bridge ? bridge.address : '';
     }
 
     get proxyAdmin(): string {

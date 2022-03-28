@@ -2,7 +2,7 @@ import "dotenv/config"
 import "@nomiclabs/hardhat-waffle";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
-import "@nomiclabs/hardhat-web3";
+import "@nomiclabs/hardhat-etherscan";
 import "./tasks/index"
 
 import {HardhatUserConfig} from "hardhat/types"
@@ -109,6 +109,9 @@ const config: HardhatUserConfig = {
             saveDeployments: true,
             gasMultiplier: 2,
         },
+    },
+    etherscan: {
+        apiKey: process.env.POLYGONSCAN_API_KEY,
     }
 };
 
