@@ -60,17 +60,24 @@ class Addresses {
 
     /* Own implementations */
 
-    get getBridgeImpl(): string {
+    get getAllBridgeImplAddresses(): string {
         return this.data.bridgeImplementations[0].address;
     }
 
-    get getSwapperImplAddresses(): string[] {
+    public getBridgeImplAddress(name: string): string {
+        const bridge = this.data.bridgeImplementations.find(bridge => {
+            return bridge.name === name;
+        });
+        return bridge ? bridge.address : '';
+    }
+
+    get getAllSwapperImplAddresses(): string[] {
         return this.data.swapImplementations.map(swapper => {
             return swapper.address;
         });
     }
 
-    get getSwapperImplCodes(): number[] {
+    get getAllSwapperImplCodes(): number[] {
         return this.data.swapImplementations.map(swapper => {
             return swapper.code;
         });
