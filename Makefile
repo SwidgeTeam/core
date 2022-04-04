@@ -5,7 +5,7 @@ CONTRACTS=${CORE} ${BRIDGES} ${EXCHANGES}
 
 TEMP_ENV_FILE := $(shell mktemp -t ".env.XXXXXX")
 
-$(shell echo -n "DEPLOY_COMMANDS=" > ${TEMP_ENV_FILE})
+$(shell echo -n "DEPLOY_COMMANDS=" >> ${TEMP_ENV_FILE})
 $(foreach net, ${NETWORKS}, $(eval _ := $(shell \
     $(foreach contract, ${CONTRACTS}, $(eval _ := $(shell \
         echo -n "${net}-${contract} " \
@@ -13,7 +13,9 @@ $(foreach net, ${NETWORKS}, $(eval _ := $(shell \
     ))) \
 )))
 
-$(shell echo -n "BRIDGE_COMMANDS=" > ${TEMP_ENV_FILE})
+$(shell echo >> ${TEMP_ENV_FILE})
+
+$(shell echo -n "BRIDGE_COMMANDS=" >> ${TEMP_ENV_FILE})
 $(foreach net, ${NETWORKS}, $(eval _ := $(shell \
     $(foreach contract, ${BRIDGES}, $(eval _ := $(shell \
         echo -n "${net}-${contract} " \

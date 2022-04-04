@@ -133,6 +133,39 @@ const addresses: ChainsAddresses = [
             }
         ]
     },
+    {
+        name: "fantom",
+        chainId: 250,
+        proxyAdmin: '0xB53FE327A78A88BdB89f99e82BDbb741311c15F8',
+        routerProxy: '0xdd700e687d8b9482fF012e91894B7d0A69A279ce',
+        router: '0x698ef266230cD82BeD2E1f4Fdf3d53382499D93E',
+        bridgeImplementations: [
+            {
+                code: 0,
+                name: 'anyswap',
+                address: '0x3d08265f9ad4E0357c6919572fc7A816B0B6C43E'
+            }
+        ],
+        bridges: [
+            {
+                name: 'anyswap',
+                address: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
+            }
+        ],
+        swapImplementations: [
+            {
+                code: 0,
+                name: 'uniswap',
+                address: '0xC2038d36865F2cFeA3be713946E7E13B296Aadf3'
+            }
+        ],
+        exchanges: [
+            {
+                name: 'uniswap',
+                address: '0xE592427A0AEce92De3Edee1F18E0157C05861564'
+            }
+        ]
+    },
 ];
 
 export default addresses;

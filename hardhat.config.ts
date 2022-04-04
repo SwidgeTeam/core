@@ -109,6 +109,13 @@ const config: HardhatUserConfig = {
             saveDeployments: true,
             gasMultiplier: 2,
         },
+        fantom: {
+            url: "https://rpcapi.fantom.network",
+            accounts,
+            chainId: 250,
+            live: true,
+            saveDeployments: true,
+        },
     },
     etherscan: {
         apiKey: process.env.POLYGONSCAN_API_KEY,
