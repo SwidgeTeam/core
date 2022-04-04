@@ -48,6 +48,17 @@ contract Router {
         }
     }
 
+    struct BridgeData {
+        uint8 id;
+        uint256 toChainId;
+        bytes data;
+    }
+
+    struct ExchangeData {
+        uint8 id;
+        bytes data;
+    }
+
     /// Init the process of swidging
     /// @dev This function is executed on the origin chain
     /// @param _srcToken Address of the token the user wants to swidge
@@ -56,9 +67,9 @@ contract Router {
         address _srcToken,
         address _dstToken,
         uint256 _srcAmount,
-        address payable _zeroExContract,
-        address _zeroExApproval,
-        bytes calldata _data
+        ExchangeData calldata _srcDEXData,
+        ExchangeData calldata _dstDEXData,
+        BridgeData calldata _bridgeData
     ) external payable {
         // Take ownership of user's tokens
         TransferHelper.safeTransferFrom(_srcToken, msg.sender, address(this), _srcAmount);
@@ -81,6 +92,15 @@ contract Router {
 
         // Transfer to the user
         TransferHelper.safeTransfer(_dstToken, msg.sender, boughtAmount);
+
+        // Load selected bridge provider
+        IBridge bridge = bridgeProviders[_bridgeData.id];
+
+        // Approve tokens for the bridge to take
+        TransferHelper.safeApprove(_srcCrossToken, address(bridge), amountOut);
+
+        // Execute bridge process
+        bridge.send(_srcToken, address(this), amountOut, _bridgeData.toChainId, _bridgeData.data);
     }
 
     /// Finalize the process of swidging

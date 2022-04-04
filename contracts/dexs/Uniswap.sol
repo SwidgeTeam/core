@@ -22,21 +22,25 @@ contract Uniswap is IDEX {
     function swap(
         address _tokenIn,
         address _tokenOut,
-        address _recipient,
-        uint256 _amountIn
+        address _from,
+        address _to,
+        uint256 _amountIn,
+        bytes calldata _data
     ) external override returns (uint256 amountOut) {
-        TransferHelper.safeTransferFrom(_tokenIn, _recipient, address(this), _amountIn);
+        TransferHelper.safeTransferFrom(_tokenIn, _from, address(this), _amountIn);
         TransferHelper.safeApprove(_tokenIn, swapRouterAddress, _amountIn);
+
+        uint256 _minimumAmountOut = abi.decode(_data, (uint256));
 
         // Set the sqrtPriceLimitx96 to be 0 to ensure we swap our exact input amount.
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
             tokenIn : _tokenIn,
             tokenOut : _tokenOut,
             fee : poolFee,
-            recipient : _recipient,
+            recipient : _to,
             deadline : block.timestamp,
             amountIn : _amountIn,
-            amountOutMinimum : 0, // TODO : needs to be either be asked to oracle or passed as parameter
+            amountOutMinimum : _minimumAmountOut,
             sqrtPriceLimitX96 : 0
         });
 

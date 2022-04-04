@@ -19,10 +19,10 @@ abstract contract IBridge is Ownable {
     }
 
     function send(
-        address _anyToken,
         address _token,
         address _to,
         uint256 _amount,
-        uint256 _toChainId
+        uint256 _toChainId,
+        bytes calldata _data
     ) external virtual;
 }
