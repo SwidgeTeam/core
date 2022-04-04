@@ -15,9 +15,7 @@ export type ChainsAddresses = ChainAddresses[];
 interface ChainAddresses {
     name: string
     chainId: any
-    proxyAdmin: string
     router: string
-    routerProxy: string
     bridgeImplementations: Bridgers
     bridges: Bridges
     swapImplementations: Swappers
@@ -99,16 +97,8 @@ class Addresses {
         return bridge ? bridge.address : '';
     }
 
-    get proxyAdmin(): string {
-        return this.data.proxyAdmin;
-    }
-
     get router(): string {
         return this.data.router;
-    }
-
-    get routerProxy(): string {
-        return this.data.routerProxy;
     }
 
 }

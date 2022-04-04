@@ -38,9 +38,6 @@ UPDATE_BRIDGE_ROUTER = ${HARDHAT} --network $(1) update-bridge-router --bridge $
 $(addprefix deploy-, ${DEPLOY_COMMANDS}): deploy-%:
 	@$(call DEPLOY,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
 
-$(addprefix update-proxy-, ${NETWORKS}): update-proxy-%:
-	@$(call UPDATE_PROXY, $*)
-
 $(addprefix verify-bridge-, ${BRIDGE_COMMANDS}): verify-bridge-%:
 	@$(call VERIFY_BRIDGE,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
 

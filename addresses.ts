@@ -4,8 +4,6 @@ const addresses: ChainsAddresses = [
     {
         name: "hardhat",
         chainId: 31337,
-        proxyAdmin: '0x8464135c8F25Da09e49BC8782676a84730C318bC',
-        routerProxy: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
         router: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
         bridgeImplementations: [
             {
@@ -37,8 +35,6 @@ const addresses: ChainsAddresses = [
     {
         name: "localhost",
         chainId: undefined,
-        proxyAdmin: '0x8464135c8F25Da09e49BC8782676a84730C318bC',
-        routerProxy: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
         router: '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853',
         bridgeImplementations: [
             {
@@ -70,9 +66,7 @@ const addresses: ChainsAddresses = [
     {
         name: "matic",
         chainId: 137,
-        proxyAdmin: '0xB53FE327A78A88BdB89f99e82BDbb741311c15F8',
-        routerProxy: '0xdd700e687d8b9482fF012e91894B7d0A69A279ce',
-        router: '0x1b42b12e3d6117a012310FAb8AC380ce50d1Cf37',
+        router: '0x0C80BadE3E4aA134bD95d48B611E692B96BcD033',
         bridgeImplementations: [
             {
                 code: 0,
@@ -103,8 +97,6 @@ const addresses: ChainsAddresses = [
     {
         name: "mumbai",
         chainId: 80001,
-        proxyAdmin: '0xB53FE327A78A88BdB89f99e82BDbb741311c15F8',
-        routerProxy: '0xdd700e687d8b9482fF012e91894B7d0A69A279ce',
         router: '0x698ef266230cD82BeD2E1f4Fdf3d53382499D93E',
         bridgeImplementations: [
             {
@@ -136,8 +128,6 @@ const addresses: ChainsAddresses = [
     {
         name: "fantom",
         chainId: 250,
-        proxyAdmin: '0xB53FE327A78A88BdB89f99e82BDbb741311c15F8',
-        routerProxy: '0xdd700e687d8b9482fF012e91894B7d0A69A279ce',
         router: '0x698ef266230cD82BeD2E1f4Fdf3d53382499D93E',
         bridgeImplementations: [
             {
