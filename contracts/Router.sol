@@ -51,34 +51,36 @@ contract Router {
     /// Init the process of swidging
     /// @dev This function is executed on the origin chain
     /// @param _srcToken Address of the token the user wants to swidge
-    /// @param _srcCrossToken Address of the token we will swap on origin chain to send to the bridge
-    /// @param _dstCrossToken Address of the token that will arrive to the destination chain
-    /// @param _dstToken Address of the token the user wants to receive on destination
     /// @param _srcAmount Amount of source tokens that user wants to move
-    /// @param _toChainId Chain identifier that the user wants its token to receive
-    /// @param _srcDEX Identifier of the exchange to use on the origin chain
-    /// @param _dstDEX Identifier of the exchange to use on the destination chain
     function initTokensCross(
         address _srcToken,
-        address _srcCrossToken,
-        address _dstCrossToken,
         address _dstToken,
         uint256 _srcAmount,
-        uint256 _toChainId,
-        uint8 _bridge,
-        uint8 _srcDEX,
-        uint8 _dstDEX
-    ) external {
+        address payable _zeroExContract,
+        address _zeroExApproval,
+        bytes calldata _data
+    ) external payable {
         // Take ownership of user's tokens
         TransferHelper.safeTransferFrom(_srcToken, msg.sender, address(this), _srcAmount);
 
-        IBridge bridge = bridgeProviders[_bridge];
+        // Get initial balance to compute final bought amount
+        uint256 boughtAmount = IERC20(_dstToken).balanceOf(address(this));
 
-        // Approve tokens for the bridge to take
-        TransferHelper.safeApprove(_srcToken, address(bridge), _srcAmount);
+        // Approve to ZeroEx
+        TransferHelper.safeApprove(_srcToken, _zeroExApproval, _srcAmount);
 
-        // Execute bridge process
-        bridge.send(_srcCrossToken, _srcToken, msg.sender, _srcAmount, _toChainId);
+        // Execute ZeroEx
+        (bool success,) = _zeroExMaker.call{value : msg.value}(_data);
+        require(success, "SWAP FAILED");
+
+        // Refund any unspent protocol fees to the sender.
+        msg.sender.transfer(address(this).balance);
+
+        // Compute final amount of bought tokens
+        boughtAmount = IERC20(_dstToken).balanceOf(address(this)) - boughtAmount;
+
+        // Transfer to the user
+        TransferHelper.safeTransfer(_dstToken, msg.sender, boughtAmount);
     }
 
     /// Finalize the process of swidging

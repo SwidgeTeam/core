@@ -66,7 +66,7 @@ const addresses: ChainsAddresses = [
     {
         name: "matic",
         chainId: 137,
-        router: '0x0C80BadE3E4aA134bD95d48B611E692B96BcD033',
+        router: '0xAEDC090394e01E1BF8B10f744E62016a795bd697',
         bridgeImplementations: [
             {
                 code: 0,
