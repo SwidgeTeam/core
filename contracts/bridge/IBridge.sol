@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
 abstract contract IBridge is Ownable {
     address private router;
@@ -18,8 +19,13 @@ abstract contract IBridge is Ownable {
         emit UpdatedRouter(routerAddress);
     }
 
+    function retrieve(address _token, uint256 _amount) external onlyOwner {
+        TransferHelper.safeTransfer(_token, msg.sender, _amount);
+    }
+
     function send(
         address _token,
+        address _from,
         address _to,
         uint256 _amount,
         uint256 _toChainId,
