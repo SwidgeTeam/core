@@ -66,12 +66,12 @@ const addresses: ChainsAddresses = [
     {
         name: "matic",
         chainId: 137,
-        router: '0xAEDC090394e01E1BF8B10f744E62016a795bd697',
+        router: '0x474587fa0346F0971162b36a0346584Ff745B9c6',
         bridgeImplementations: [
             {
                 code: 0,
                 name: 'anyswap',
-                address: '0x3d08265f9ad4E0357c6919572fc7A816B0B6C43E'
+                address: '0xa6318769cEfcAd7454c69bb47D864375ac286e89'
             }
         ],
         bridges: [
@@ -133,13 +133,13 @@ const addresses: ChainsAddresses = [
             {
                 code: 0,
                 name: 'anyswap',
-                address: '0x3d08265f9ad4E0357c6919572fc7A816B0B6C43E'
+                address: '0xB3EEAa6e39A01C288A042693cEaB1323b02a02B4'
             }
         ],
         bridges: [
             {
                 name: 'anyswap',
-                address: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
+                address: '0x1ccca1ce62c62f7be95d4a67722a8fdbed6eecb4'
             }
         ],
         swapImplementations: [

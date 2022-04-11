@@ -118,7 +118,10 @@ const config: HardhatUserConfig = {
         },
     },
     etherscan: {
-        apiKey: process.env.POLYGONSCAN_API_KEY,
+        apiKey: {
+            polygon: process.env.POLYGONSCAN_API_KEY,
+            opera: process.env.FTMSCAN_API_KEY
+        }
     }
 };
 

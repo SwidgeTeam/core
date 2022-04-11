@@ -11,11 +11,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     await deploy('Router', {
         from: deployer,
-        args: [
-            addresses.getAllBridgeImplAddresses,
-            addresses.getAllSwapperImplAddresses,
-            addresses.getAllSwapperImplCodes
-        ],
+        args: [addresses.getAllBridgeImplAddresses],
         log: true,
     });
 
