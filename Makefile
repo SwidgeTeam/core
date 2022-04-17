@@ -33,6 +33,7 @@ HARDHAT = npx hardhat
 DEPLOY = ${HARDHAT} --network $(1) deploy --tags $(2)
 UPDATE_PROXY = ${HARDHAT} --network $(1) update-proxy
 VERIFY_BRIDGE = ${HARDHAT} --network $(1) verify-bridge --bridge $(2)
+VERIFY_ROUTER = ${HARDHAT} --network $(1) verify-router
 UPDATE_BRIDGE_ROUTER = ${HARDHAT} --network $(1) update-bridge-router --bridge $(2)
 
 $(addprefix deploy-, ${DEPLOY_COMMANDS}): deploy-%:
@@ -40,6 +41,9 @@ $(addprefix deploy-, ${DEPLOY_COMMANDS}): deploy-%:
 
 $(addprefix verify-bridge-, ${BRIDGE_COMMANDS}): verify-bridge-%:
 	@$(call VERIFY_BRIDGE,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
+
+$(addprefix verify-router-, ${NETWORKS}): verify-router-%:
+	@$(call VERIFY_ROUTER,$*)
 
 $(addprefix update-router-, ${BRIDGE_COMMANDS}): update-router-%:
 	@$(call UPDATE_BRIDGE_ROUTER,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
