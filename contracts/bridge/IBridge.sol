@@ -25,8 +25,7 @@ abstract contract IBridge is Ownable {
 
     function send(
         address _token,
-        address _from,
-        address _to,
+        address _router,
         uint256 _amount,
         uint256 _toChainId,
         bytes calldata _data

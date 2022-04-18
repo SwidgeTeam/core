@@ -28,18 +28,16 @@ contract Router is Ownable {
 
     struct BridgeData {
         address tokenIn;
-        address receiverAddress;
         uint256 toChainId;
         bytes data;
     }
 
     event CrossInitiated(
-        uint256 amount,
         uint256 indexed toChainId,
-        address indexed router,
-        address user,
-        address dstTokenIn,
-        address dstTokenOut,
+        uint256 amount,
+        address receiver,
+        address dstSwapIn,
+        address dstSwapOut,
         address maker,
         bytes data
     );
@@ -87,7 +85,6 @@ contract Router is Ownable {
         bridge.send(
             _bridgeData.tokenIn,
             address(this),
-            _bridgeData.receiverAddress,
             boughtAmount,
             _bridgeData.toChainId,
             _bridgeData.data
@@ -98,9 +95,8 @@ contract Router is Ownable {
 
         // Emit event for relayer
         emit CrossInitiated(
-            boughtAmount,
             _bridgeData.toChainId,
-            _bridgeData.receiverAddress,
+            boughtAmount,
             msg.sender,
             _dstSwapData.tokenIn,
             _dstSwapData.tokenOut,
