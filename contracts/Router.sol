@@ -106,6 +106,7 @@ contract Router is Ownable {
     }
 
     /// Finalize the process of swidging
+    /// @dev add modifier to block this function to the onlyRelayer
     function finalizeTokenCross(
         SwapData calldata _swapData,
         uint256 _amount,

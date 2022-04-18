@@ -23,7 +23,7 @@ const config: HardhatUserConfig = {
         ]
     },
     namedAccounts: {
-        deployer: {
+        first_deployer: {
             default: 0,
         },
         admin: {
@@ -31,6 +31,9 @@ const config: HardhatUserConfig = {
         },
         user: {
             default: 2,
+        },
+        deployer: {
+            default: 3,
         },
     },
     defaultNetwork: "hardhat",
