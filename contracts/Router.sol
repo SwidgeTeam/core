@@ -8,15 +8,11 @@ import "./dexs/IDEX.sol";
 import "./bridge/IBridge.sol";
 
 contract Router is Ownable {
+    address private relayerAddress;
     mapping(uint8 => IBridge) private bridgeProviders;
 
     enum bridgeCode {
         Anyswap // 0
-    }
-
-    /// @param _anyswapRouterAddress Address of the default bridge
-    constructor(address _anyswapRouterAddress) {
-        bridgeProviders[uint8(bridgeCode.Anyswap)] = IBridge(_anyswapRouterAddress);
     }
 
     struct SwapData {
@@ -31,6 +27,33 @@ contract Router is Ownable {
         uint256 toChainId;
         bytes data;
     }
+
+    /// @param _anyswapRouterAddress Address of the default bridge
+    constructor(address _anyswapRouterAddress) {
+        bridgeProviders[uint8(bridgeCode.Anyswap)] = IBridge(_anyswapRouterAddress);
+    }
+
+    /**
+     * @dev Updates the address of the authorized relayer
+     */
+    function updateRelayer(address _relayerAddress) external onlyOwner {
+        address oldAddress = relayerAddress;
+        relayerAddress = _relayerAddress;
+        emit UpdatedRelayer(oldAddress, relayerAddress);
+    }
+
+    /**
+     * @dev Throws if called by any account other than the relayer.
+     */
+    modifier onlyRelayer() {
+        require(relayerAddress == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    event UpdatedRelayer(
+        address oldAddress,
+        address newAddress
+    );
 
     event CrossInitiated(
         uint256 indexed toChainId,
