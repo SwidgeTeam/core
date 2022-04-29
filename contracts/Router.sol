@@ -15,19 +15,6 @@ contract Router is Ownable {
         Anyswap // 0
     }
 
-    struct SwapData {
-        address tokenIn;
-        address tokenOut;
-        address payable callAddress;
-        bytes callData;
-    }
-
-    struct BridgeData {
-        address tokenIn;
-        uint256 toChainId;
-        bytes data;
-    }
-
     /// @param _anyswapRouterAddress Address of the default bridge
     constructor(address _anyswapRouterAddress) {
         bridgeProviders[uint8(bridgeCode.Anyswap)] = IBridge(_anyswapRouterAddress);
@@ -50,91 +37,146 @@ contract Router is Ownable {
         _;
     }
 
+    /**
+     * @dev Emitted when the relayer address is updated
+     */
     event UpdatedRelayer(
         address oldAddress,
         address newAddress
     );
 
+    /**
+     * @dev Emitted when a multi-chain swap is initiated
+     */
     event CrossInitiated(
-        uint256 indexed toChainId,
-        uint256 amount,
-        address receiver,
-        address dstSwapIn,
-        address dstSwapOut,
-        address maker,
-        bytes data
+        bytes txUuid,
+        uint256 amountOut
     );
+
+    /**
+     * @dev Emitted when a multi-chain swap is finalized
+     */
+    event CrossFinalized(
+        bytes txUuid,
+        uint256 amountOut
+    );
+
+    /**
+     * @dev Emitted when a single-chain swap is completed
+     */
+    event SwapExecuted(
+        bytes txUuid,
+        uint256 amountOut
+    );
+
+    /**
+     * @dev Defines the details for the swap step
+     */
+    struct SwapData {
+        address tokenIn;
+        address tokenOut;
+        address payable callAddress;
+        bytes callData;
+        bool required;
+    }
+
+    /**
+     * @dev Defines the details for the bridge step
+     */
+    struct BridgeData {
+        address tokenIn;
+        uint256 toChainId;
+        bytes data;
+        bool required;
+    }
 
     /// Init the process of swidging
     /// @dev This function is executed on the origin chain
     function initTokensCross(
         uint256 _srcAmount,
-        SwapData calldata _srcSwapData,
-        SwapData calldata _dstSwapData,
-        BridgeData calldata _bridgeData
+        SwapData calldata _swapData,
+        BridgeData calldata _bridgeData,
+        bytes calldata _txUuid
     ) external payable {
+        // We need either the swap or the bridge step to be required
+        require(_swapData.required || _bridgeData.required, "No required actions");
+
+        address tokenToTakeIn;
+        // Need to check which token is going to be taken as input
+        if (_swapData.required) {
+            tokenToTakeIn = _swapData.tokenIn;
+        }
+        else {
+            tokenToTakeIn = _bridgeData.tokenIn;
+        }
+
         // Take ownership of user's tokens
         TransferHelper.safeTransferFrom(
-            _srcSwapData.tokenIn,
+            tokenToTakeIn,
             msg.sender,
             address(this),
             _srcAmount
         );
 
-        // Approve to ZeroEx
-        TransferHelper.safeApprove(
-            _srcSwapData.tokenIn,
-            _srcSwapData.callAddress,
-            _srcAmount
-        );
+        uint256 finalAmount;
+        // Store the amount for the next step
+        // depending on the step to take
+        if (_swapData.required) {
+            // Approve to ZeroEx
+            TransferHelper.safeApprove(
+                _swapData.tokenIn,
+                _swapData.callAddress,
+                _srcAmount
+            );
 
-        // Execute swap with ZeroEx and compute final `boughtAmount`
-        uint256 boughtAmount = IERC20(_srcSwapData.tokenOut).balanceOf(address(this));
-        (bool success,) = _srcSwapData.callAddress.call{value : msg.value}(_srcSwapData.callData);
-        require(success, "SWAP FAILED");
-        boughtAmount = IERC20(_srcSwapData.tokenOut).balanceOf(address(this)) - boughtAmount;
+            // Execute swap with ZeroEx and compute final `boughtAmount`
+            finalAmount = IERC20(_swapData.tokenOut).balanceOf(address(this));
+            (bool success,) = _swapData.callAddress.call{value : msg.value}(_swapData.callData);
+            require(success, "SWAP FAILED");
+            finalAmount = IERC20(_swapData.tokenOut).balanceOf(address(this)) - finalAmount;
+        }
+        else {
+            finalAmount = _srcAmount;
+        }
 
-        // Load selected bridge provider
-        IBridge bridge = bridgeProviders[uint8(bridgeCode.Anyswap)];
+        if (_bridgeData.required) {
+            // Load selected bridge provider
+            IBridge bridge = bridgeProviders[uint8(bridgeCode.Anyswap)];
 
-        // Approve tokens for the bridge to take
-        TransferHelper.safeApprove(
-            _bridgeData.tokenIn,
-            address(bridge),
-            boughtAmount
-        );
+            // Approve tokens for the bridge to take
+            TransferHelper.safeApprove(
+                _bridgeData.tokenIn,
+                address(bridge),
+                finalAmount
+            );
 
-        // Execute bridge process
-        bridge.send(
-            _bridgeData.tokenIn,
-            address(this),
-            boughtAmount,
-            _bridgeData.toChainId,
-            _bridgeData.data
-        );
+            // Execute bridge process
+            bridge.send(
+                _bridgeData.tokenIn,
+                address(this),
+                finalAmount,
+                _bridgeData.toChainId,
+                _bridgeData.data
+            );
 
-        // Refund any unspent protocol fees to the sender.
-        payable(msg.sender).transfer(address(this).balance);
-
-        // Emit event for relayer
-        emit CrossInitiated(
-            _bridgeData.toChainId,
-            boughtAmount,
-            msg.sender,
-            _dstSwapData.tokenIn,
-            _dstSwapData.tokenOut,
-            _dstSwapData.callAddress,
-            _dstSwapData.callData
-        );
+            // Emit event for relayer
+            emit CrossInitiated(_txUuid, finalAmount);
+        }
+        else {
+            // Bridging is not required, means we are not changing network
+            // so we send the assets back to the user
+            TransferHelper.safeTransfer(_swapData.tokenOut, msg.sender, finalAmount);
+            emit SwapExecuted(_txUuid, finalAmount);
+        }
     }
 
     /// Finalize the process of swidging
-    /// @dev add modifier to block this function to the onlyRelayer
     function finalizeTokenCross(
-        SwapData calldata _swapData,
         uint256 _amount,
-        address _receiver
-    ) external payable {
+        address _receiver,
+        SwapData calldata _swapData,
+        bytes calldata _txUuid
+    ) external payable onlyRelayer {
         // Approve to ZeroEx
         TransferHelper.safeApprove(
             _swapData.tokenIn,
@@ -154,6 +196,8 @@ contract Router is Ownable {
             _receiver,
             boughtAmount
         );
+
+        emit CrossFinalized(_txUuid, boughtAmount);
     }
 
     /// To retrieve any tokens that got stuck on the contract
