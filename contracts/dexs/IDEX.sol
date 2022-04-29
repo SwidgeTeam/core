@@ -2,17 +2,12 @@
 pragma solidity ^0.8.0;
 
 interface IDEX {
-
-    function custodianAddress() external view returns (address);
-
     function swap(
         address _tokenIn,
         address _tokenOut,
-        address _from,
-        address _to,
+        address _router,
         uint256 _amountIn,
         bytes calldata _data
-    ) external returns (uint256 amountOut);
-
+    ) external payable returns (uint256 amountOut);
 }
 

@@ -10,14 +10,41 @@ import "./bridge/IBridge.sol";
 contract Router is Ownable {
     address private relayerAddress;
     mapping(uint8 => IBridge) private bridgeProviders;
+    mapping(uint8 => IDEX) private swapProviders;
+
+    enum dexCode {
+        Uniswap, // 0
+        ZeroEx // 1
+    }
 
     enum bridgeCode {
         Anyswap // 0
     }
 
-    /// @param _anyswapRouterAddress Address of the default bridge
-    constructor(address _anyswapRouterAddress) {
-        bridgeProviders[uint8(bridgeCode.Anyswap)] = IBridge(_anyswapRouterAddress);
+    /**
+     * @dev Throws if called by any account other than the relayer.
+     */
+    modifier onlyRelayer() {
+        require(relayerAddress == _msgSender(), "Caller is not the relayer");
+        _;
+    }
+
+    /**
+     * @dev Updates the address of a bridge provider contract
+     */
+    function updateBridgeProvider(bridgeCode _code, address _address) external onlyOwner {
+        uint8 code = uint8(_code);
+        bridgeProviders[code] = IBridge(_address);
+        emit UpdatedBridgeProvider(code, _address);
+    }
+
+    /**
+     * @dev Updates the address of a swap provider contract
+     */
+    function updateSwapProvider(dexCode _code, address _address) external onlyOwner {
+        uint8 code = uint8(_code);
+        swapProviders[code] = IDEX(_address);
+        emit UpdatedSwapProvider(code, _address);
     }
 
     /**
@@ -30,12 +57,20 @@ contract Router is Ownable {
     }
 
     /**
-     * @dev Throws if called by any account other than the relayer.
+     * @dev Emitted when a bridge provider address is updated
      */
-    modifier onlyRelayer() {
-        require(relayerAddress == _msgSender(), "Ownable: caller is not the owner");
-        _;
-    }
+    event UpdatedBridgeProvider(
+        uint8 code,
+        address provAddress
+    );
+
+    /**
+     * @dev Emitted when a swap provider address is updated
+     */
+    event UpdatedSwapProvider(
+        uint8 code,
+        address provAddress
+    );
 
     /**
      * @dev Emitted when the relayer address is updated
@@ -73,10 +108,10 @@ contract Router is Ownable {
      * @dev Defines the details for the swap step
      */
     struct SwapData {
+        uint8 providerCode;
         address tokenIn;
         address tokenOut;
-        address payable callAddress;
-        bytes callData;
+        bytes data;
         bool required;
     }
 
@@ -90,10 +125,12 @@ contract Router is Ownable {
         bool required;
     }
 
-    /// Init the process of swidging
-    /// @dev This function is executed on the origin chain
+    /**
+     * Init the process of swidging
+     * @dev This function is executed on the origin chain
+     */
     function initTokensCross(
-        uint256 _srcAmount,
+        uint256 _amount,
         SwapData calldata _swapData,
         BridgeData calldata _bridgeData,
         bytes calldata _txUuid
@@ -115,28 +152,35 @@ contract Router is Ownable {
             tokenToTakeIn,
             msg.sender,
             address(this),
-            _srcAmount
+            _amount
         );
 
         uint256 finalAmount;
         // Store the amount for the next step
         // depending on the step to take
         if (_swapData.required) {
-            // Approve to ZeroEx
+            IDEX swapper = swapProviders[_swapData.providerCode];
+
+            // Approve swapper contract
             TransferHelper.safeApprove(
                 _swapData.tokenIn,
-                _swapData.callAddress,
-                _srcAmount
+                address(swapper),
+                _amount
             );
 
-            // Execute swap with ZeroEx and compute final `boughtAmount`
-            finalAmount = IERC20(_swapData.tokenOut).balanceOf(address(this));
-            (bool success,) = _swapData.callAddress.call{value : msg.value}(_swapData.callData);
-            require(success, "SWAP FAILED");
-            finalAmount = IERC20(_swapData.tokenOut).balanceOf(address(this)) - finalAmount;
+            // Execute the swap
+            finalAmount = swapper.swap(
+                _swapData.tokenIn,
+                _swapData.tokenOut,
+                address(this),
+                _amount,
+                _swapData.data
+            );
         }
         else {
-            finalAmount = _srcAmount;
+            // If swap is not required the amount going
+            // to the bridge is the same that came in
+            finalAmount = _amount;
         }
 
         if (_bridgeData.required) {
@@ -170,25 +214,34 @@ contract Router is Ownable {
         }
     }
 
-    /// Finalize the process of swidging
+
+    /**
+     * Finalize the process of swidging
+     * @dev This function is executed on the destination chain
+     */
     function finalizeTokenCross(
         uint256 _amount,
         address _receiver,
         SwapData calldata _swapData,
         bytes calldata _txUuid
     ) external payable onlyRelayer {
-        // Approve to ZeroEx
+        IDEX swapper = swapProviders[_swapData.providerCode];
+
+        // Approve swapper contract
         TransferHelper.safeApprove(
             _swapData.tokenIn,
-            _swapData.callAddress,
+            address(swapper),
             _amount
         );
 
         // Execute swap with ZeroEx and compute final `boughtAmount`
-        uint256 boughtAmount = IERC20(_swapData.tokenOut).balanceOf(address(this));
-        (bool success,) = _swapData.callAddress.call{value : msg.value}(_swapData.callData);
-        require(success, "SWAP FAILED");
-        boughtAmount = IERC20(_swapData.tokenOut).balanceOf(address(this)) - boughtAmount;
+        uint256 boughtAmount = swapper.swap(
+            _swapData.tokenIn,
+            _swapData.tokenOut,
+            address(this),
+            _amount,
+            _swapData.data
+        );
 
         // Send tokens to the user
         TransferHelper.safeTransfer(
