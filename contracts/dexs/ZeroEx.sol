@@ -12,7 +12,7 @@ contract ZeroEx is IDEX {
         address _router,
         uint256 _amountIn,
         bytes calldata _data
-    ) external payable override returns (uint256 boughtAmount) {
+    ) external payable override onlyRouter returns (uint256 boughtAmount) {
         TransferHelper.safeTransferFrom(_tokenIn, _router, address(this), _amountIn);
 
         (address callAddress, bytes memory callData) = abi.decode(_data, (address, bytes));

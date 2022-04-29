@@ -21,7 +21,7 @@ contract Uniswap is IDEX {
         address _router,
         uint256 _amountIn,
         bytes calldata _data
-    ) external payable override returns (uint256 amountOut) {
+    ) external payable override onlyRouter returns (uint256 amountOut) {
         TransferHelper.safeTransferFrom(_tokenIn, _router, address(this), _amountIn);
         TransferHelper.safeApprove(_tokenIn, providerAddress, _amountIn);
 
