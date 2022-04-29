@@ -13,3 +13,7 @@ task("verify-router", "Verifies the router contract")
 task("update-bridge-router", "Updated the router address on a bridge implementation")
     .addParam('bridge', 'Name of the bridge contract to update')
     .setAction(require('./update-bridge-router'));
+
+task("update-swapper-router", "Updated the router address on a swapper implementation")
+    .addParam('swapper', 'Name of the swapper contract to update')
+    .setAction(require('./update-swapper-router'));

@@ -6,9 +6,9 @@ module.exports = async function (taskArguments, hre, runSuper) {
     const {deployer} = await ethers.getNamedSigners();
     const bridgeName = taskArguments.bridge;
     const contractName = getContractName(bridgeName);
-    const Anyswap = await ethers.getContractFactory(contractName, deployer);
+    const bridgeContractFactory = await ethers.getContractFactory(contractName, deployer);
     const contractAddress = addresses.getBridgeImplAddress(bridgeName);
-    const contract = await Anyswap.attach(contractAddress);
+    const contract = await bridgeContractFactory.attach(contractAddress);
     await contract.updateRouter(addresses.router);
 
     console.log('Address updated');

@@ -18,6 +18,27 @@ npx hardhat help
 ### Deploy
 
 - Deploy providers
+
+```shell
+make deploy-<chain>-anyswap
+make deploy-<chain>-zeroex
+```
+
 - Deploy router
-- Update provider addresses on router
+
+```shell
+make deploy-<chain>-router
+```
+
 - Update router address on providers
+
+```shell
+make update-router-<chain>-anyswap
+make update-router-<chain>-zeroex
+```
+
+- Add new providers on router
+
+```shell
+...
+```

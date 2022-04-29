@@ -66,7 +66,7 @@ const addresses: ChainsAddresses = [
     {
         name: "matic",
         chainId: 137,
-        router: '0x3cCcCcFaF090d8eD924833a8f155BeE2094b8B79',
+        router: '0x08aEBd8C3097C78e135CF76AC27A0e717c069d2d',
         bridgeImplementations: [
             {
                 code: 0,
@@ -89,7 +89,7 @@ const addresses: ChainsAddresses = [
             {
                 code: 1,
                 name: 'zeroex',
-                address: ''
+                address: '0x45446123Cb78368732F87793Faee7AcC43b8c2CA'
             }
         ],
         exchanges: [
@@ -133,7 +133,7 @@ const addresses: ChainsAddresses = [
     {
         name: "fantom",
         chainId: 250,
-        router: '0x3cCcCcFaF090d8eD924833a8f155BeE2094b8B79',
+        router: '0x08aEBd8C3097C78e135CF76AC27A0e717c069d2d',
         bridgeImplementations: [
             {
                 code: 0,
@@ -156,7 +156,7 @@ const addresses: ChainsAddresses = [
             {
                 code: 1,
                 name: 'zeroex',
-                address: ''
+                address: '0x3c12C54d9F1Cf162BB962e9A6D28fcc176621392'
             }
         ],
         exchanges: [
