@@ -7,7 +7,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     const {deployer} = await getNamedAccounts();
 
-    await deploy('Router', {
+    await deploy('ZeroEx', {
         from: deployer,
         args: [],
         log: true,
@@ -15,4 +15,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 };
 export default func;
-func.tags = ["router"]
+func.tags = ["zeroex"]

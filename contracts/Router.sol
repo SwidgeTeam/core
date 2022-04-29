@@ -169,7 +169,7 @@ contract Router is Ownable {
             );
 
             // Execute the swap
-            finalAmount = swapper.swap(
+            finalAmount = swapper.swap{value : msg.value}(
                 _swapData.tokenIn,
                 _swapData.tokenOut,
                 address(this),

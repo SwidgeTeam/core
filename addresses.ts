@@ -85,6 +85,11 @@ const addresses: ChainsAddresses = [
                 code: 0,
                 name: 'uniswap',
                 address: '0xC2038d36865F2cFeA3be713946E7E13B296Aadf3'
+            },
+            {
+                code: 1,
+                name: 'zeroex',
+                address: ''
             }
         ],
         exchanges: [
@@ -147,6 +152,11 @@ const addresses: ChainsAddresses = [
                 code: 0,
                 name: 'uniswap',
                 address: '0xC2038d36865F2cFeA3be713946E7E13B296Aadf3'
+            },
+            {
+                code: 1,
+                name: 'zeroex',
+                address: ''
             }
         ],
         exchanges: [

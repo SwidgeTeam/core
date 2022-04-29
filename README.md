@@ -13,3 +13,11 @@ npx hardhat node
 node scripts/sample-script.js
 npx hardhat help
 ```
+
+
+### Deploy
+
+- Deploy providers
+- Deploy router
+- Update provider addresses on router
+- Update router address on providers
