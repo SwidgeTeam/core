@@ -72,6 +72,14 @@ class Addresses {
         return swapper ? swapper.address : '';
     }
 
+    get getAllBridgeImpl(): Bridgers {
+        return this.data.bridgeImplementations;
+    }
+
+    get getAllSwapperImpl(): Swappers {
+        return this.data.swapImplementations;
+    }
+
     /* External contracts */
 
     public getExchangeAddress(name: string): string {

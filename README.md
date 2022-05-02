@@ -40,5 +40,5 @@ make update-router-<chain>-zeroex
 - Add new providers on router
 
 ```shell
-...
+make set-providers
 ```

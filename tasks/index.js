@@ -17,3 +17,6 @@ task("update-bridge-router", "Updated the router address on a bridge implementat
 task("update-swapper-router", "Updated the router address on a swapper implementation")
     .addParam('swapper', 'Name of the swapper contract to update')
     .setAction(require('./update-swapper-router'));
+
+task("set-providers", "Sets the providers addresses")
+    .setAction(require('./set-providers'));

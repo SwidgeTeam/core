@@ -46,6 +46,7 @@ VERIFY_BRIDGE = ${HARDHAT} --network $(1) verify-bridge --bridge $(2)
 VERIFY_ROUTER = ${HARDHAT} --network $(1) verify-router
 UPDATE_BRIDGE_ROUTER = ${HARDHAT} --network $(1) update-bridge-router --bridge $(2)
 UPDATE_SWAPPER_ROUTER = ${HARDHAT} --network $(1) update-swapper-router --swapper $(2)
+SET_PROVIDERS = ${HARDHAT} --network $(1) set-providers
 
 $(addprefix deploy-, ${DEPLOY_COMMANDS}): deploy-%:
 	@$(call DEPLOY,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
@@ -55,6 +56,9 @@ $(addprefix verify-bridge-, ${BRIDGE_COMMANDS}): verify-bridge-%:
 
 $(addprefix verify-router-, ${NETWORKS}): verify-router-%:
 	@$(call VERIFY_ROUTER,$*)
+
+$(addprefix set-providers-, ${NETWORKS}): set-providers-%:
+	@$(call SET_PROVIDERS,$*)
 
 $(addprefix update-router-, ${BRIDGE_COMMANDS}): update-router-%:
 	@$(call UPDATE_BRIDGE_ROUTER,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
