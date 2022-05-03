@@ -1,5 +1,5 @@
-import { expect } from "chai";
-import { ethers } from "hardhat";
+import {expect} from "chai";
+import {ethers} from "hardhat";
 import {ZeroAddress} from "./variables";
 import {Contract, ContractFactory} from "ethers";
 
@@ -13,25 +13,80 @@ describe("Router", function () {
         routerContract = await RouterFactory.connect(owner).deploy();
     });
 
-    it("Should fail if anyone else than the owner tries to update the relayer", async function () {
-        const [owner, anyoneElse, random] = await ethers.getSigners();
+    describe('Update Events', () => {
 
-        expect(routerContract.connect(anyoneElse).updateRelayer(random.address))
-            .to.be.reverted;
+        describe('Update Relayer', () => {
+            it("Should fail if anyone else than the owner tries to update the relayer", async function () {
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                await expect(routerContract.connect(anyoneElse).updateRelayer(random.address))
+                    .to.be.reverted;
+            });
+
+            it("Should fail if the new relayer address is ZeroAddress", async function () {
+                const [owner] = await ethers.getSigners();
+
+                await expect(routerContract.connect(owner).updateRelayer(ZeroAddress))
+                    .to.be.reverted;
+            });
+
+            it("Should emit an event when the relayer is successfully updated", async function () {
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                await expect(routerContract.connect(owner).updateRelayer(random.address))
+                    .to.emit(routerContract, 'UpdatedRelayer')
+                    .withArgs(ZeroAddress, random.address);
+            });
+        });
+
+        describe('Updated Bridge Provider', () => {
+            it("Should fail if anyone else than the owner tries to update a bridge provider address", async function () {
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                await expect(routerContract.connect(anyoneElse).updateBridgeProvider(0, random.address))
+                    .to.be.reverted;
+            });
+
+            it("Should fail if the new bridge provider address is ZeroAddress", async function () {
+                const [owner] = await ethers.getSigners();
+
+                await expect(routerContract.connect(owner).updateBridgeProvider(0, ZeroAddress))
+                    .to.be.reverted;
+            });
+
+            it("Should emit an event when the bridge provider is successfully updated", async function () {
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                await expect(routerContract.connect(owner).updateBridgeProvider(0, random.address))
+                    .to.emit(routerContract, 'UpdatedBridgeProvider')
+                    .withArgs(0, random.address);
+            });
+        });
+
+        describe('Updated Swap Provider', () => {
+            it("Should fail if anyone else than the owner tries to update a swap provider address", async function () {
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                await expect(routerContract.connect(anyoneElse).updateSwapProvider(0, random.address))
+                    .to.be.reverted;
+            });
+
+            it("Should fail if the new swap provider address is ZeroAddress", async function () {
+                const [owner] = await ethers.getSigners();
+
+                await expect(routerContract.connect(owner).updateSwapProvider(0, ZeroAddress))
+                    .to.be.reverted;
+            });
+
+            it("Should emit an event when the swap provider is successfully updated", async function () {
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                await expect(routerContract.connect(owner).updateSwapProvider(0, random.address))
+                    .to.emit(routerContract, 'UpdatedSwapProvider')
+                    .withArgs(0, random.address);
+            });
+        });
+
     });
 
-    it("Should fail if the new relayer address is ZeroAddress", async function () {
-        const [owner] = await ethers.getSigners();
-
-        expect(routerContract.connect(owner).updateRelayer(ZeroAddress))
-            .to.be.reverted;
-    });
-
-    it("Should emit an event when the relayer is successfully updated", async function () {
-        const [owner, anyoneElse, random] = await ethers.getSigners();
-
-        expect(await routerContract.connect(owner).updateRelayer(random.address))
-            .to.emit(routerContract, 'UpdatedRelayer')
-            .withArgs(ZeroAddress, random.address);
-    });
 });

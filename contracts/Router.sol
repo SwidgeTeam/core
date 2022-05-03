@@ -33,6 +33,7 @@ contract Router is Ownable {
      * @dev Updates the address of a bridge provider contract
      */
     function updateBridgeProvider(bridgeCode _code, address _address) external onlyOwner {
+        require(_address != address(0), 'ZeroAddress not allowed');
         uint8 code = uint8(_code);
         bridgeProviders[code] = IBridge(_address);
         emit UpdatedBridgeProvider(code, _address);
@@ -42,6 +43,7 @@ contract Router is Ownable {
      * @dev Updates the address of a swap provider contract
      */
     function updateSwapProvider(dexCode _code, address _address) external onlyOwner {
+        require(_address != address(0), 'ZeroAddress not allowed');
         uint8 code = uint8(_code);
         swapProviders[code] = IDEX(_address);
         emit UpdatedSwapProvider(code, _address);
