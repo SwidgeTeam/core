@@ -51,6 +51,7 @@ contract Router is Ownable {
      * @dev Updates the address of the authorized relayer
      */
     function updateRelayer(address _relayerAddress) external onlyOwner {
+        require(_relayerAddress != address(0), 'ZeroAddress not allowed');
         address oldAddress = relayerAddress;
         relayerAddress = _relayerAddress;
         emit UpdatedRelayer(oldAddress, relayerAddress);
