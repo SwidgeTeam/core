@@ -1,7 +1,8 @@
 import {expect} from "chai";
 import {ethers} from "hardhat";
-import {ZeroAddress} from "./variables";
+import {RandomAddress, ZeroAddress} from "./variables";
 import {Contract, ContractFactory} from "ethers";
+import {getDeployMockContract} from "@nomiclabs/hardhat-waffle/dist/src/deploy";
 
 describe("Router", function () {
     let RouterFactory: ContractFactory;
@@ -89,4 +90,29 @@ describe("Router", function () {
 
     });
 
+    describe('Swidge process', () => {
+        it("Should revert if no swap nor bridge step is required", async function () {
+            const [owner, anyoneElse] = await ethers.getSigners();
+            const contract = routerContract.connect(anyoneElse);
+
+            await expect(contract.initTokensCross(
+                1000000,
+                [
+                    0,
+                    RandomAddress,
+                    RandomAddress,
+                    '0x',
+                    false
+                ],
+                [
+                    RandomAddress,
+                    57,
+                    '0x',
+                    false
+                ],
+                '0x'
+            ))
+                .to.be.revertedWith('No required actions');
+        });
+    });
 });
