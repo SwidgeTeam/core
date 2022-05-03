@@ -1,10 +1,11 @@
-const {expect} = require("chai");
-const {ethers} = require("hardhat");
-const {ZeroAddress} = require("./variables");
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import {ZeroAddress} from "./variables";
+import {Contract, ContractFactory} from "ethers";
 
 describe("Router", function () {
-    let RouterFactory;
-    let routerContract;
+    let RouterFactory: ContractFactory;
+    let routerContract: Contract;
 
     beforeEach(async () => {
         RouterFactory = await ethers.getContractFactory("Router");
