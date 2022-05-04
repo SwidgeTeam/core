@@ -1,0 +1,228 @@
+import chai, {expect} from "chai";
+import {ethers} from "hardhat";
+import {fakeTokenContract, RandomAddress, ZeroAddress, zeroExEncodedCalldata} from "./shared";
+import {Contract, ContractFactory} from "ethers";
+import {smock} from "@defi-wonderland/smock";
+
+chai.use(smock.matchers);
+
+describe("Router", function () {
+    let RouterFactory: ContractFactory;
+    let contract: Contract;
+
+    beforeEach(async () => {
+        RouterFactory = await ethers.getContractFactory("Router");
+        const [owner] = await ethers.getSigners();
+        contract = await RouterFactory.connect(owner).deploy();
+    });
+
+    describe('Update Events', () => {
+
+        describe('Update Relayer', () => {
+            it("Should fail if anyone else than the owner tries to update the relayer", async function () {
+                /** Arrange */
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(anyoneElse).updateRelayer(random.address);
+
+                /** Assert */
+                await expect(call).to.be.reverted;
+            });
+
+            it("Should fail if the new relayer address is ZeroAddress", async function () {
+                /** Arrange */
+                const [owner] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(owner).updateRelayer(ZeroAddress);
+
+                /** Assert */
+                await expect(call).to.be.reverted;
+            });
+
+            it("Should emit an event when the relayer is successfully updated", async function () {
+                /** Arrange */
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(owner).updateRelayer(random.address);
+
+                /** Assert */
+                await expect(call)
+                    .to.emit(contract, 'UpdatedRelayer')
+                    .withArgs(ZeroAddress, random.address);
+            });
+        });
+
+        describe('Updated Bridge Provider', () => {
+            it("Should fail if anyone else than the owner tries to update a bridge provider address", async function () {
+                /** Arrange */
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(anyoneElse).updateBridgeProvider(0, random.address);
+
+                /** Assert */
+                await expect(call).to.be.reverted;
+            });
+
+            it("Should fail if the new bridge provider address is ZeroAddress", async function () {
+                /** Arrange */
+                const [owner] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(owner).updateBridgeProvider(0, ZeroAddress);
+
+                /** Assert */
+                await expect(call).to.be.reverted;
+            });
+
+            it("Should emit an event when the bridge provider is successfully updated", async function () {
+                /** Arrange */
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(owner).updateBridgeProvider(0, random.address);
+
+                /** Assert */
+                await expect(call)
+                    .to.emit(contract, 'UpdatedBridgeProvider')
+                    .withArgs(0, random.address);
+            });
+        });
+
+        describe('Updated Swap Provider', () => {
+            it("Should fail if anyone else than the owner tries to update a swap provider address", async function () {
+                /** Arrange */
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(anyoneElse).updateSwapProvider(0, random.address);
+
+                /** Assert */
+                await expect(call).to.be.reverted;
+            });
+
+            it("Should fail if the new swap provider address is ZeroAddress", async function () {
+                /** Arrange */
+                const [owner] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(owner).updateSwapProvider(0, ZeroAddress);
+
+                /** Assert */
+                await expect(call).to.be.reverted;
+            });
+
+            it("Should emit an event when the swap provider is successfully updated", async function () {
+                /** Arrange */
+                const [owner, anyoneElse, random] = await ethers.getSigners();
+
+                /** Act */
+                const call = contract.connect(owner).updateSwapProvider(0, random.address);
+
+                /** Assert */
+                await expect(call)
+                    .to.emit(contract, 'UpdatedSwapProvider')
+                    .withArgs(0, random.address);
+            });
+        });
+
+    });
+
+    describe('Swidge process', () => {
+        it("Should revert if no swap nor bridge step is required", async function () {
+            /** Arrange */
+            const [owner, anyoneElse] = await ethers.getSigners();
+
+            /** Act */
+            const call = contract.connect(anyoneElse).initTokensCross(
+                1000000,
+                [
+                    0,
+                    RandomAddress,
+                    RandomAddress,
+                    '0x',
+                    false
+                ],
+                [
+                    RandomAddress,
+                    57,
+                    '0x',
+                    false
+                ],
+                '0x'
+            );
+
+            /** Assert */
+            await expect(call).to.be.revertedWith('No required actions');
+        });
+
+        it("Should only execute swap if no briging step is required", async function () {
+            /** Arrange */
+            const [owner, anyoneElse] = await ethers.getSigners();
+
+            // Deploy fake providers
+            const mockAnyswapContract = await mockAnyswap();
+            const mockZeroExContract = await mockZeroEx();
+
+            // Update providers' router address
+            await mockAnyswapContract.connect(owner).updateRouter(contract.address);
+            await mockZeroExContract.connect(owner).updateRouter(contract.address);
+
+            // Set providers on router
+            await contract.connect(owner).updateBridgeProvider(0, mockAnyswapContract.address);
+            await contract.connect(owner).updateSwapProvider(0, mockZeroExContract.address);
+
+            // Create two fake ERC20 tokens
+            const fakeTokenIn = await fakeTokenContract();
+            const fakeTokenOut = await fakeTokenContract();
+
+            // Fake response from executed methods on the output token
+            fakeTokenOut.balanceOf.returnsAtCall(0, 10);
+            fakeTokenOut.balanceOf.returnsAtCall(1, 20);
+
+            const [callData] = await zeroExEncodedCalldata();
+
+            /** Act */
+            const call = contract
+                .connect(anyoneElse)
+                .initTokensCross(
+                    1000000,
+                    [
+                        0,
+                        fakeTokenIn.address,
+                        fakeTokenOut.address,
+                        callData,
+                        true
+                    ],
+                    [
+                        RandomAddress,
+                        57,
+                        '0x',
+                        false
+                    ],
+                    '0x'
+                );
+
+            /** Assert */
+            await expect(call)
+                .to.emit(contract, 'SwapExecuted')
+                .withArgs('0x', 10);
+            await expect(mockZeroExContract.swap).to.be.calledOnce;
+        });
+    });
+});
+
+async function mockAnyswap() {
+    const RouterFactory = await smock.mock("Anyswap");
+    const [owner] = await ethers.getSigners();
+    return await RouterFactory.connect(owner).deploy(ZeroAddress);
+}
+
+async function mockZeroEx() {
+    const RouterFactory = await smock.mock("ZeroEx");
+    const [owner] = await ethers.getSigners();
+    return await RouterFactory.connect(owner).deploy();
+}

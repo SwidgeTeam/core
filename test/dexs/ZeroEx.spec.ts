@@ -1,8 +1,8 @@
 import {ethers} from "hardhat";
 import chai, {expect} from "chai";
-import {fakeTokenContract, RandomAddress, ZeroAddress} from "../shared";
+import {fakeTokenContract, RandomAddress, ZeroAddress, zeroExEncodedCalldata} from "../shared";
 import {Contract, ContractFactory} from "ethers";
-import {smock} from "@defi-wonderland/smock";
+import {FakeContract, smock} from "@defi-wonderland/smock";
 
 chai.use(smock.matchers);
 
@@ -83,15 +83,8 @@ describe('ZeroEx', () => {
         const fakeTokenIn = await fakeTokenContract();
         const fakeTokenOut = await fakeTokenContract();
 
-        // Create a fake contract
-        const ABI = ['function testFunction() external'];
-        const myFake = await smock.fake(ABI);
-
-        // Fake a fail on the provider execution
-        myFake.testFunction.returns(false);
-
-        // Generate the encoded callData required to execute the function
-        const callData = await encodedCalldata(ABI, 'testFunction', myFake.address);
+        // Generate the fake contract and the payload
+        const [callData] = await zeroExEncodedCalldata();
 
         /** Act */
         const call = contract.connect(router).swap(
@@ -119,12 +112,8 @@ describe('ZeroEx', () => {
         fakeTokenOut.balanceOf.returnsAtCall(0, 10);
         fakeTokenOut.balanceOf.returnsAtCall(1, 20);
 
-        // Create a fake contract
-        const ABI = ['function testFunction() external'];
-        const myFake = await smock.fake(ABI);
-
-        // Generate the encoded callData required to execute the function
-        const callData = await encodedCalldata(ABI, 'testFunction', myFake.address);
+        // Generate the fake contract and the payload
+        const [callData, myFake] = await zeroExEncodedCalldata();
 
         /** Act */
         await contract.connect(router).swap(
@@ -141,39 +130,3 @@ describe('ZeroEx', () => {
     });
 
 });
-
-/**
- * Generates bytes of this data types:
- * (address, bytes)
- * The first address will be the invoked contract
- * The rest of the bytes are the callData for that contract (not relevant on this scope)
- * @param ABI
- * @param functionName
- * @param address
- */
-async function encodedCalldata(
-    ABI: string | ReadonlyArray<any>,
-    functionName: string,
-    address: string
-) {
-    const abiInterface = new ethers.utils.Interface(ABI);
-
-    // Encode contract call address
-    const encodedCallAddress = ethers.utils.defaultAbiCoder.encode(
-        ['address'],
-        [address]
-    );
-
-    // Encode contract call payload
-    const encodedSelector = abiInterface.getSighash(functionName);
-    const encodedArguments = ethers.utils.defaultAbiCoder.encode(
-        ['uint256', 'uint256'],
-        [10, 20]
-    );
-
-    // Pack bytes
-    const encodedCallData = ethers.utils.hexConcat([encodedSelector, encodedArguments]);
-
-    // Return payload
-    return ethers.utils.hexConcat([encodedCallAddress, encodedCallData]);
-}
