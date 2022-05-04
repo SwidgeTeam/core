@@ -12,11 +12,13 @@ abstract contract Provider is Ownable {
         _;
     }
 
-    event UpdatedRouter(address indexed routerAddress);
+    event UpdatedRouter(address indexed oldAddress, address indexed newAddress);
 
     function updateRouter(address _routerAddress) external onlyOwner {
+        require(address(0) != _routerAddress, 'No ZeroAddress allowed');
+        address oldAddress = router;
         router = _routerAddress;
-        emit UpdatedRouter(_routerAddress);
+        emit UpdatedRouter(oldAddress, _routerAddress);
     }
 
     function retrieve(address _token, uint256 _amount) external onlyOwner {

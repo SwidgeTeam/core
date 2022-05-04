@@ -13,10 +13,17 @@ contract ZeroEx is IDEX {
         uint256 _amountIn,
         bytes calldata _data
     ) external payable override onlyRouter returns (uint256 boughtAmount) {
+        // Take the tokens from the router
         TransferHelper.safeTransferFrom(_tokenIn, _router, address(this), _amountIn);
 
-        (address callAddress, bytes memory callData) = abi.decode(_data, (address, bytes));
+        // Extract the contract address from the bytes
+        (address payable callAddress) = abi.decode(_data, (address));
 
+        // Remove the first 32 bytes(an address)
+        // to have the correct callData for the provider contract
+        bytes memory callData = _data[32:];
+
+        // Approve tokens to the provider contract
         TransferHelper.safeApprove(_tokenIn, callAddress, _amountIn);
 
         // Execute swap with ZeroEx and compute final `boughtAmount`
@@ -25,6 +32,8 @@ contract ZeroEx is IDEX {
         require(success, "SWAP FAILED");
         boughtAmount = IERC20(_tokenOut).balanceOf(address(this)) - boughtAmount;
 
+        // Send tokens back to the router
         TransferHelper.safeTransfer(_tokenOut, _router, boughtAmount);
     }
+
 }
