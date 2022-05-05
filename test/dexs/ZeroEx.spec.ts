@@ -2,7 +2,7 @@ import {ethers} from "hardhat";
 import chai, {expect} from "chai";
 import {fakeTokenContract, RandomAddress, ZeroAddress, zeroExEncodedCalldata} from "../shared";
 import {Contract, ContractFactory} from "ethers";
-import {FakeContract, smock} from "@defi-wonderland/smock";
+import {smock} from "@defi-wonderland/smock";
 
 chai.use(smock.matchers);
 
@@ -19,10 +19,11 @@ describe('ZeroEx', () => {
     it("Should fail if anyone else than the owner tries to update the router address", async function () {
         /** Arrange */
         const [owner, anyoneElse, random] = await ethers.getSigners();
-        contract = contract.connect(anyoneElse)
 
         /** Act */
-        const call = contract.updateRouter(random.address)
+        const call = contract
+            .connect(anyoneElse)
+            .updateRouter(random.address);
 
         /** Assert */
         await expect(call).to.be.reverted;
@@ -31,10 +32,11 @@ describe('ZeroEx', () => {
     it("Should fail if the new router address is ZeroAddress", async function () {
         /** Arrange */
         const [owner] = await ethers.getSigners();
-        contract = contract.connect(owner);
 
         /** Act */
-        const call = contract.updateRouter(ZeroAddress);
+        const call = contract
+            .connect(owner)
+            .updateRouter(ZeroAddress);
 
         /** Assert */
         await expect(call).to.be.reverted;
@@ -43,10 +45,11 @@ describe('ZeroEx', () => {
     it("Should emit an event when the router is successfully updated", async function () {
         /** Arrange */
         const [owner, anyoneElse, random] = await ethers.getSigners();
-        contract = contract.connect(owner);
 
         /** Act */
-        const call = contract.updateRouter(random.address);
+        const call = contract
+            .connect(owner)
+            .updateRouter(random.address);
 
         /** Assert */
         await expect(call)
@@ -57,18 +60,20 @@ describe('ZeroEx', () => {
     it("Should fail to execute if the caller is not the router", async function () {
         /** Arrange */
         const [owner, anyoneElse, router] = await ethers.getSigners();
-        await contract.connect(owner)
+        await contract
+            .connect(owner)
             .updateRouter(router.address);
-        contract = contract.connect(anyoneElse);
 
         /** Act */
-        const call = contract.swap(
-            RandomAddress,
-            RandomAddress,
-            router.address,
-            1000000,
-            '0x',
-        );
+        const call = contract
+            .connect(anyoneElse)
+            .swap(
+                RandomAddress,
+                RandomAddress,
+                router.address,
+                1000000,
+                '0x',
+            );
 
         /** Assert */
         await expect(call).to.revertedWith('Unauthorized caller');
@@ -77,7 +82,9 @@ describe('ZeroEx', () => {
     it("Should revert if provider fails the execution", async function () {
         /** Arrange */
         const [owner, anyoneElse, router] = await ethers.getSigners();
-        await contract.connect(owner).updateRouter(router.address);
+        await contract
+            .connect(owner)
+            .updateRouter(router.address);
 
         // Create to fake ERC20 tokens
         const fakeTokenIn = await fakeTokenContract();
@@ -87,13 +94,15 @@ describe('ZeroEx', () => {
         const [callData] = await zeroExEncodedCalldata();
 
         /** Act */
-        const call = contract.connect(router).swap(
-            fakeTokenIn.address,
-            fakeTokenOut.address,
-            router.address,
-            1000000,
-            callData,
-        );
+        const call = contract
+            .connect(router)
+            .swap(
+                fakeTokenIn.address,
+                fakeTokenOut.address,
+                router.address,
+                1000000,
+                callData,
+            );
 
         /** Assert */
         await expect(call).to.be.reverted;
@@ -102,7 +111,9 @@ describe('ZeroEx', () => {
     it("Should execute provider swap and return token to router", async function () {
         /** Arrange */
         const [owner, anyoneElse, router] = await ethers.getSigners();
-        await contract.connect(owner).updateRouter(router.address);
+        await contract
+            .connect(owner)
+            .updateRouter(router.address);
 
         // Create two fake ERC20 tokens
         const fakeTokenIn = await fakeTokenContract();
@@ -116,13 +127,15 @@ describe('ZeroEx', () => {
         const [callData, myFake] = await zeroExEncodedCalldata();
 
         /** Act */
-        await contract.connect(router).swap(
-            fakeTokenIn.address,
-            fakeTokenOut.address,
-            router.address,
-            1000000,
-            callData,
-        );
+        await contract
+            .connect(router)
+            .swap(
+                fakeTokenIn.address,
+                fakeTokenOut.address,
+                router.address,
+                1000000,
+                callData,
+            );
 
         /** Assert */
         expect(myFake.testFunction).to.have.been.calledOnce;
