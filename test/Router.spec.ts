@@ -351,6 +351,37 @@ describe("Router", function () {
                 );
         });
     });
+
+    it("Should fail if anyone else than the owner tries to retrieve", async function () {
+        /** Arrange */
+        const [owner, anyoneElse] = await ethers.getSigners();
+
+        /** Act */
+        const call = contract
+            .connect(anyoneElse)
+            .retrieve(RandomAddress, 1);
+
+        /** Assert */
+        await expect(call).to.be.reverted;
+    });
+
+    it("Should allow the owner to retrieve funds", async function () {
+        /** Arrange */
+        const [owner] = await ethers.getSigners();
+        const fakeToken = await fakeTokenContract();
+
+        /** Act */
+        await contract
+            .connect(owner)
+            .retrieve(fakeToken.address, 1);
+
+        /** Assert */
+        await expect(fakeToken.transfer)
+            .to.be.calledOnceWith(
+                owner.address,
+                1
+            );
+    });
 });
 
 async function mockAnyswap() {
