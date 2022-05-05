@@ -152,14 +152,14 @@ describe("Router", function () {
                     '0x',
                     false
                 ],
-                '0x'
+                'txUuid'
             );
 
             /** Assert */
             await expect(call).to.be.revertedWith('No required actions');
         });
 
-        it("Should only execute swap if no briging step is required", async function () {
+        it("Should only execute swap if no bridging step is required", async function () {
             /** Arrange */
             const [owner, anyoneElse] = await ethers.getSigners();
 
@@ -199,18 +199,74 @@ describe("Router", function () {
                     ],
                     [
                         RandomAddress,
-                        57,
+                        1337,
                         '0x',
                         false
                     ],
-                    '0x'
+                    'txUuid'
                 );
 
             /** Assert */
             await expect(call)
                 .to.emit(contract, 'SwapExecuted')
-                .withArgs('0x', 10);
+                .withArgs('txUuid', 10);
             await expect(mockZeroExContract.swap).to.be.calledOnce;
+        });
+
+        it("Should only execute bridge if no swapping step is required", async function () {
+            /** Arrange */
+            const [owner, anyoneElse] = await ethers.getSigners();
+
+            // Deploy fake providers
+            const mockAnyswapContract = await mockAnyswap();
+            const mockZeroExContract = await mockZeroEx();
+
+            // Update providers' router address
+            await mockAnyswapContract.connect(owner).updateRouter(contract.address);
+            await mockZeroExContract.connect(owner).updateRouter(contract.address);
+
+            // Set providers on router
+            await contract.connect(owner).updateBridgeProvider(0, mockAnyswapContract.address);
+            await contract.connect(owner).updateSwapProvider(0, mockZeroExContract.address);
+
+            // Create two fake ERC20 tokens
+            const fakeTokenIn = await fakeTokenContract();
+
+            const callData = ethers.utils.defaultAbiCoder.encode(['address'], [RandomAddress]);
+
+            /** Act */
+            const call = contract
+                .connect(anyoneElse)
+                .initTokensCross(
+                    1000000,
+                    [
+                        0,
+                        RandomAddress,
+                        RandomAddress,
+                        '0x',
+                        false
+                    ],
+                    [
+                        fakeTokenIn.address,
+                        1337,
+                        callData,
+                        true
+                    ],
+                    'txUuid'
+                );
+
+            /** Assert */
+            await expect(call)
+                .to.emit(contract, 'CrossInitiated')
+                .withArgs('txUuid', 1000000);
+            await expect(mockAnyswapContract.send)
+                .to.be.calledOnceWith(
+                    fakeTokenIn.address,
+                    contract.address,
+                    1000000,
+                    1337,
+                    callData
+                );
         });
     });
 });
@@ -218,7 +274,8 @@ describe("Router", function () {
 async function mockAnyswap() {
     const RouterFactory = await smock.mock("Anyswap");
     const [owner] = await ethers.getSigners();
-    return await RouterFactory.connect(owner).deploy(ZeroAddress);
+    const someContract = await fakeTokenContract();
+    return await RouterFactory.connect(owner).deploy(someContract.address);
 }
 
 async function mockZeroEx() {

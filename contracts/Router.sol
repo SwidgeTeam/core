@@ -87,7 +87,7 @@ contract Router is Ownable {
      * @dev Emitted when a multi-chain swap is initiated
      */
     event CrossInitiated(
-        bytes txUuid,
+        string txUuid,
         uint256 amountOut
     );
 
@@ -95,7 +95,7 @@ contract Router is Ownable {
      * @dev Emitted when a multi-chain swap is finalized
      */
     event CrossFinalized(
-        bytes txUuid,
+        string txUuid,
         uint256 amountOut
     );
 
@@ -103,7 +103,7 @@ contract Router is Ownable {
      * @dev Emitted when a single-chain swap is completed
      */
     event SwapExecuted(
-        bytes txUuid,
+        string txUuid,
         uint256 amountOut
     );
 
@@ -136,7 +136,7 @@ contract Router is Ownable {
         uint256 _amount,
         SwapData calldata _swapData,
         BridgeData calldata _bridgeData,
-        bytes calldata _txUuid
+        string calldata _txUuid
     ) external payable {
         // We need either the swap or the bridge step to be required
         require(_swapData.required || _bridgeData.required, "No required actions");
@@ -226,7 +226,7 @@ contract Router is Ownable {
         uint256 _amount,
         address _receiver,
         SwapData calldata _swapData,
-        bytes calldata _txUuid
+        string calldata _txUuid
     ) external payable onlyRelayer {
         IDEX swapper = swapProviders[_swapData.providerCode];
 
