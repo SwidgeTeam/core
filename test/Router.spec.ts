@@ -131,7 +131,7 @@ describe("Router", function () {
 
     });
 
-    describe('Swidge process', () => {
+    describe('Swidge init process', () => {
         it("Should revert if no swap nor bridge step is required", async function () {
             /** Arrange */
             const [owner, anyoneElse] = await ethers.getSigners();
@@ -348,6 +348,88 @@ describe("Router", function () {
                     10,
                     1337,
                     callDataBridge
+                );
+        });
+    });
+
+    describe('Swidge finalize process', () => {
+        it("Should if anyone else than relayer is the caller", async function () {
+            /** Arrange */
+            const [owner, anyoneElse, relayer] = await ethers.getSigners();
+            await contract.connect(owner).updateRelayer(relayer.address);
+
+            /** Act */
+            const call = contract.connect(anyoneElse).finalizeTokenCross(
+                1000000,
+                RandomAddress,
+                [
+                    1,
+                    RandomAddress,
+                    RandomAddress,
+                    '0x',
+                    false
+                ],
+                'txUuid'
+            );
+
+            /** Assert */
+            await expect(call).to.be.revertedWith('Caller is not the relayer');
+        });
+
+        it("Should execute the swap if relayer is the caller", async function () {
+            /** Arrange */
+            const [owner, anyoneElse, relayer] = await ethers.getSigners();
+            await contract
+                .connect(owner)
+                .updateRelayer(relayer.address);
+
+            // Deploy fake provider
+            const mockZeroExContract = await mockZeroEx();
+
+            // Update provider's router address
+            await mockZeroExContract.connect(owner).updateRouter(contract.address);
+
+            // Set provider on router
+            await contract.connect(owner).updateSwapProvider(0, mockZeroExContract.address);
+
+            // Create two fake ERC20 tokens
+            const fakeTokenIn = await fakeTokenContract();
+            const fakeTokenOut = await fakeTokenContract();
+
+            // Fake response from executed methods on the output token
+            fakeTokenOut.balanceOf.returnsAtCall(0, 10);
+            fakeTokenOut.balanceOf.returnsAtCall(1, 20);
+
+            const [callData] = await zeroExEncodedCalldata();
+
+            /** Act */
+            const call = contract
+                .connect(relayer)
+                .finalizeTokenCross(
+                    1000000,
+                    RandomAddress,
+                    [
+                        0,
+                        fakeTokenIn.address,
+                        fakeTokenOut.address,
+                        callData,
+                        true
+                    ],
+                    'txUuid'
+                );
+
+            /** Assert */
+            await expect(call)
+                .to.emit(contract, 'CrossFinalized')
+                .withArgs('txUuid', 10);
+
+            await expect(mockZeroExContract.swap)
+                .to.be.calledOnceWith(
+                    fakeTokenIn.address,
+                    fakeTokenOut.address,
+                    contract.address,
+                    1000000,
+                    callData
                 );
         });
     });
