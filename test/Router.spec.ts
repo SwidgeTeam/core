@@ -432,6 +432,50 @@ describe("Router", function () {
                     callData
                 );
         });
+
+        it("Should revert if the provider fails", async function () {
+            /** Arrange */
+            const [owner, anyoneElse, relayer] = await ethers.getSigners();
+            await contract
+                .connect(owner)
+                .updateRelayer(relayer.address);
+
+            // Deploy fake provider
+            const mockZeroExContract = await mockZeroEx();
+
+            // Update provider's router address
+            await mockZeroExContract.connect(owner).updateRouter(contract.address);
+
+            // Set provider on router
+            await contract.connect(owner).updateSwapProvider(0, mockZeroExContract.address);
+
+            // Create two fake ERC20 tokens
+            const fakeTokenIn = await fakeTokenContract();
+            const fakeTokenOut = await fakeTokenContract();
+
+            mockZeroExContract.swap.reverts();
+
+            const [callData] = await zeroExEncodedCalldata();
+
+            /** Act */
+            const call = contract
+                .connect(relayer)
+                .finalizeTokenCross(
+                    1000000,
+                    RandomAddress,
+                    [
+                        0,
+                        fakeTokenIn.address,
+                        fakeTokenOut.address,
+                        callData,
+                        true
+                    ],
+                    'txUuid'
+                );
+
+            /** Assert */
+            await expect(call).to.be.reverted;
+        });
     });
 
     it("Should fail if anyone else than the owner tries to retrieve", async function () {
