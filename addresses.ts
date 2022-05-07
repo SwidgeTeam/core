@@ -89,7 +89,7 @@ const addresses: ChainsAddresses = [
             {
                 code: 1,
                 name: 'zeroex',
-                address: '0x45446123Cb78368732F87793Faee7AcC43b8c2CA'
+                address: '0x18e9A90297D67225365C92F3f6112085b7E91b5d'
             }
         ],
         exchanges: [
@@ -156,7 +156,7 @@ const addresses: ChainsAddresses = [
             {
                 code: 1,
                 name: 'zeroex',
-                address: '0x3c12C54d9F1Cf162BB962e9A6D28fcc176621392'
+                address: '0x18e9A90297D67225365C92F3f6112085b7E91b5d'
             }
         ],
         exchanges: [

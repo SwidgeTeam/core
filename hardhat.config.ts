@@ -97,7 +97,7 @@ const config: HardhatUserConfig = {
             gasMultiplier: 2,
         },
         matic: {
-            url: "https://rpc-mainnet.maticvigil.com",
+            url: "https://matic-mainnet.chainstacklabs.com/",
             accounts,
             chainId: 137,
             live: true,
@@ -113,11 +113,12 @@ const config: HardhatUserConfig = {
             gasMultiplier: 2,
         },
         fantom: {
-            url: "https://rpcapi.fantom.network",
+            url: "https://rpc.ftm.tools/",
             accounts,
             chainId: 250,
             live: true,
             saveDeployments: true,
+            gasMultiplier: 10,
         },
     },
     etherscan: {
