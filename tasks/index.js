@@ -20,3 +20,6 @@ task("update-swapper-router", "Updated the router address on a swapper implement
 
 task("set-providers", "Sets the providers addresses")
     .setAction(require('./set-providers'));
+
+task("update-relayer", "Updates the relayer addresses")
+    .setAction(require('./update-relayer'));
