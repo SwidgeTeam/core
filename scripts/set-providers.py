@@ -1,7 +1,7 @@
-from brownie import Router, ZeroEx, accounts, Contract
+from brownie import Router
 
 from scripts.src.deploy import from_deployer
-from scripts.src.addresses import save_addresses, load_addresses
+from scripts.src.addresses import load_addresses
 
 """
 Sets the whole set of providers into the deployed Router

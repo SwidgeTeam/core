@@ -1,4 +1,4 @@
-from brownie import Router, ZeroEx, Anyswap, accounts, Contract
+from brownie.network.main import show_active
 
 from scripts.src.addresses import save_addresses, load_addresses
 from scripts.src.deploy import deploy_contracts

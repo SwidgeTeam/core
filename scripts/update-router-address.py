@@ -1,7 +1,7 @@
-from brownie import Router, ZeroEx, Anyswap
+from brownie import ZeroEx, Anyswap
 
 from scripts.src.deploy import from_deployer
-from scripts.src.addresses import save_addresses, load_addresses
+from scripts.src.addresses import load_addresses
 
 """
 Updates the Router address on all deployed providers

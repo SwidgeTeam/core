@@ -1,7 +1,7 @@
 from brownie import Router, ZeroEx, Anyswap, accounts, Contract
 
 from scripts.src.accounts import deployer, user, random
-from scripts.src.addresses import save_addresses, load_addresses
+from scripts.src.addresses import load_addresses
 from scripts.src.Contracts import Contracts
 
 from_deployer = {'from': deployer}

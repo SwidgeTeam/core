@@ -1,4 +1,5 @@
-from brownie import Router, ZeroEx, accounts, Contract
+from brownie.network.main import show_active
+
 from scripts.src.deploy import deploy_contracts, from_deployer, from_user
 from scripts.src.accounts import deployer, user, random
 from scripts.src.tokens import load_tokens, transfer_tokens_to
