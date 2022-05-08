@@ -8,7 +8,7 @@ from scripts.src.tokens import load_tokens, transfer_tokens_to
 Executes the function finalizeTokenCross from Router
 """
 def main():
-    network = 'hardhat'
+    network = show_active()
     contracts = deploy_contracts(network)
 
     contracts.router().updateRelayer(user.address, from_deployer)

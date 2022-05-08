@@ -8,7 +8,7 @@ Deploys the whole set of contracts
 and saves the addresses on the file
 """
 def main():
-    network = 'hardhat'
+    network = show_active()
     contracts = deploy_contracts(network)
 
     address = load_addresses(network)

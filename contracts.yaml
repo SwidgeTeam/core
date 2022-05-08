@@ -1,18 +1,19 @@
-hardhat:
+local:
   bridgeImpl:
     anyswap:
-      address: '0x6b4BDe1086912A6Cb24ce3dB43b3466e6c72AFd3'
+      address: ''
       code: 0
   bridges:
-    anyswap: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
-  relayer: '0x167ef146136cfB56E146f041c09a7cD9a438476F'
-  router: '0x6951b5Bd815043E3F842c1b026b0Fa888Cc2DD85'
+    anyswap: ''
+  relayer: ''
+  router: ''
   swapImpl:
     zeroex:
-      address: '0xe0aA552A10d7EC8760Fc6c246D391E698a82dDf9'
+      address: ''
       code: 0
-  zeroex: '0xf3080e463C529cB37313d637be6F2f6D369ca86D'
-matic:
+  zeroex: ''
+
+polygon-main:
   bridgeImpl:
     anyswap:
       address: '0x4E5548E3f4Ba7184Bfb819960212b194e0a27479'

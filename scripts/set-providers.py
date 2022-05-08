@@ -1,4 +1,5 @@
 from brownie import Router
+from brownie.network.main import show_active
 
 from scripts.src.deploy import from_deployer
 from scripts.src.addresses import load_addresses
@@ -7,8 +8,7 @@ from scripts.src.addresses import load_addresses
 Sets the whole set of providers into the deployed Router
 """
 def main():
-    network = 'hardhat'
-
+    network = show_active()
     address = load_addresses(network)
 
     router = Router.at(address['router'])
