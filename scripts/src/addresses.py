@@ -17,9 +17,9 @@ into the file
 """
 def save_addresses(network, arr):
     # If we are saving addresses while in
-    # a forked network, we save on `hardhat`
+    # a forked network, we save on `local`
     if '-fork' in network:
-        network = 'hardhat'
+        network = 'local'
 
     with open('contracts.yaml', 'r') as file:
         addresses = yaml.safe_load(file)

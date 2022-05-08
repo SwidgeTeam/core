@@ -10,7 +10,7 @@ compiler:
       - "@nomiclabs=Nomiclabs/buidler@1.3.0"
 
 networks:
-  default: hardhat
+  default: local
 
 dependencies:
   - OpenZeppelin/openzeppelin-contracts@4.2.0

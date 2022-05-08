@@ -3,8 +3,8 @@ development:
     cmd_settings:
       port: 8545
     host: http://localhost
-    id: hardhat
-    name: Hardhat
+    id: local
+    name: Local instance
 
   - cmd: ganache-cli
     cmd_settings:
@@ -130,15 +130,6 @@ live:
         host: https://www.ethercluster.com/kotti
         id: kotti
         name: Kotti
-
-  - name: Arbitrum)
-    networks:
-      - chainid: 42161
-        explorer: https://api.arbiscan.io/api
-        host: https://arb1.arbitrum.io/rpc
-        id: arbitrum-main
-        multicall2: '0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858'
-        name: Mainnet
 
   - name: Avalanche
     networks:

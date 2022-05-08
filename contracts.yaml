@@ -1,4 +1,4 @@
-hardhat:
+local:
   bridgeImpl:
     anyswap:
       address: '0x4E5548E3f4Ba7184Bfb819960212b194e0a27479'
