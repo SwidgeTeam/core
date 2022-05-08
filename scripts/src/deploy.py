@@ -7,6 +7,10 @@ from scripts.src.Contracts import Contracts
 from_deployer = {'from': deployer}
 from_user = {'from': user}
 
+"""
+Deploys the whole set of contracts
+and returns the instances
+"""
 def deploy_contracts(network):
     address = load_addresses(network)
 
