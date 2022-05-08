@@ -35,4 +35,4 @@ def deploy_contracts(network):
     return Contracts(
         router=router,
         zeroex=zeroEx,
-        anyswap=anyswap)
+        multichain=anyswap)
