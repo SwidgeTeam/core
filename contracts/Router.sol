@@ -132,7 +132,7 @@ contract Router is Ownable {
      * Init the process of swidging
      * @dev This function is executed on the origin chain
      */
-    function initTokensCross(
+    function initSwidge(
         uint256 _amount,
         SwapData calldata _swapData,
         BridgeData calldata _bridgeData,
@@ -222,7 +222,7 @@ contract Router is Ownable {
      * Finalize the process of swidging
      * @dev This function is executed on the destination chain
      */
-    function finalizeTokenCross(
+    function finalizeSwidge(
         uint256 _amount,
         address _receiver,
         SwapData calldata _swapData,
@@ -237,8 +237,7 @@ contract Router is Ownable {
             _amount
         );
 
-        // Execute swap with ZeroEx and compute final `boughtAmount`
-        uint256 boughtAmount = swapper.swap(
+        uint256 boughtAmount = swapper.swap{value : msg.value}(
             _swapData.tokenIn,
             _swapData.tokenOut,
             address(this),
