@@ -5,18 +5,21 @@ Loads addresses of a specific domain
 into into an array
 """
 def load_addresses(network):
-    main_network = network.replace('-fork', '')
+    # We want to take the addresses from main network
+    network = network.replace('-fork', '')
     with open('contracts.yaml', 'r') as file:
         addresses = yaml.safe_load(file)
-        return addresses[main_network]
+        return addresses[network]
 
 """
 Store the addresses of a specific domain
 into the file
 """
 def save_addresses(network, arr):
+    # If we are saving addresses while in
+    # a forked network, we save on `hardhat`
     if '-fork' in network:
-        network = 'local'
+        network = 'hardhat'
 
     with open('contracts.yaml', 'r') as file:
         addresses = yaml.safe_load(file)

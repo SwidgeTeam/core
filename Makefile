@@ -39,33 +39,18 @@ REMOVE_TEMP_ENV_FILE := $(shell unlink ${TEMP_ENV_FILE})
 
 .PHONY: deploy
 
+BROWNIE = brownie
+BROWNIE_NETWORKS = ${BROWNIE} networks $(1)
+BROWNIE_COMPILE = ${BROWNIE} compile $(1)
+
 HARDHAT = npx hardhat
 DEPLOY = ${HARDHAT} --network $(1) deploy --tags $(2)
-UPDATE_PROXY = ${HARDHAT} --network $(1) update-proxy
-VERIFY_BRIDGE = ${HARDHAT} --network $(1) verify-bridge --bridge $(2)
-VERIFY_ROUTER = ${HARDHAT} --network $(1) verify-router
-UPDATE_BRIDGE_ROUTER = ${HARDHAT} --network $(1) update-bridge-router --bridge $(2)
-UPDATE_SWAPPER_ROUTER = ${HARDHAT} --network $(1) update-swapper-router --swapper $(2)
-SET_PROVIDERS = ${HARDHAT} --network $(1) set-providers
-UPDATE_RELAYER = ${HARDHAT} --network $(1) update-relayer
 
 $(addprefix deploy-, ${DEPLOY_COMMANDS}): deploy-%:
 	@$(call DEPLOY,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
 
-$(addprefix verify-bridge-, ${BRIDGE_COMMANDS}): verify-bridge-%:
-	@$(call VERIFY_BRIDGE,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
+import:
+	@${call BROWNIE_NETWORKS, import network-config.yaml true}
 
-$(addprefix verify-router-, ${NETWORKS}): verify-router-%:
-	@$(call VERIFY_ROUTER,$*)
-
-$(addprefix set-providers-, ${NETWORKS}): set-providers-%:
-	@$(call SET_PROVIDERS,$*)
-
-$(addprefix update-relayer-, ${NETWORKS}): update-relayer-%:
-	@$(call UPDATE_RELAYER,$*)
-
-$(addprefix update-router-, ${BRIDGE_COMMANDS}): update-router-%:
-	@$(call UPDATE_BRIDGE_ROUTER,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
-
-$(addprefix update-router-, ${EXCHANGE_COMMANDS}): update-router-%:
-	@$(call UPDATE_SWAPPER_ROUTER,$(shell echo $* | cut -d'-' -f 1),$(shell echo $* | cut -d'-' -f 2-))
+compile:
+	@${call BROWNIE_COMPILE, --all}
