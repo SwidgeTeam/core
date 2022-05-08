@@ -1,14 +1,15 @@
 hardhat:
   bridgeImpl:
     anyswap:
-      address: '0x7aB7F14E9ca5E8d6dDCD75Cd5108F89d7bB90Abf'
+      address: '0x6b4BDe1086912A6Cb24ce3dB43b3466e6c72AFd3'
       code: 0
   bridges:
     anyswap: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
-  router: '0xa475777b3589F2a39a98a5379E92Fc022608BDF8'
+  relayer: '0x167ef146136cfB56E146f041c09a7cD9a438476F'
+  router: '0x6951b5Bd815043E3F842c1b026b0Fa888Cc2DD85'
   swapImpl:
     zeroex:
-      address: '0x1dd7c219a060Cb3592ACd9001f2f23A1a058fE6e'
+      address: '0xe0aA552A10d7EC8760Fc6c246D391E698a82dDf9'
       code: 0
   zeroex: '0xf3080e463C529cB37313d637be6F2f6D369ca86D'
 matic:
@@ -18,6 +19,7 @@ matic:
       code: 0
   bridges:
     anyswap: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
+  relayer: '0x167ef146136cfB56E146f041c09a7cD9a438476F'
   router: '0x575F51164266D53441820c89BbB2d700Ec865109'
   swapImpl:
     zeroex:
