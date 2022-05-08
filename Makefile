@@ -19,7 +19,7 @@ BROWNIE_NETWORKS = ${BROWNIE} networks $(1)
 BROWNIE_COMPILE = ${BROWNIE} compile $(1)
 BROWNIE_RUN = ${BROWNIE} run --network $(1) $(2)
 
-BROWNIE_DEPLOY = $(call BROWNIE_RUN, $(2), scripts/deploy.py main $(1))
+BROWNIE_DEPLOY = $(call BROWNIE_RUN, $(2), scripts/tasks/deploy.py main $(1))
 
 $(addprefix deploy., ${DEPLOY_COMMANDS}): deploy.%:
 	@$(call BROWNIE_DEPLOY,$(shell echo $* | cut -d'.' -f 1),$(shell echo $* | cut -d'.' -f 2))
