@@ -18,24 +18,20 @@ def deploy_contracts(network):
     zeroEx = deployer.deploy(ZeroEx)
     anyswap = deployer.deploy(Anyswap, address['bridges']['anyswap'])
 
-    zeroEx.updateRouter(router, from_deployer)
-    anyswap.updateRouter(router, from_deployer)
+    zeroEx.updateRouter(router.address, from_deployer)
+    anyswap.updateRouter(router.address, from_deployer)
 
     router.updateSwapProvider(
         address['swapImpl']['zeroex']['code'],
-        zeroEx,
+        zeroEx.address,
         from_deployer)
 
     router.updateBridgeProvider(
         address['bridgeImpl']['anyswap']['code'],
-        anyswap,
+        anyswap.address,
         from_deployer)
 
-    address['router'] = router.address
-    address['bridgeImpl']['anyswap']['address'] = anyswap.address
-    address['swapImpl']['zeroex']['address'] = zeroEx.address
-
-    router.updateRelayer(address['router'], from_deployer)
+    router.updateRelayer(router.address, from_deployer)
 
     return Contracts(
         router=router,

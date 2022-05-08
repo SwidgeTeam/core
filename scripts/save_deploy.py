@@ -14,6 +14,8 @@ def main():
     address = load_addresses(network)
 
     address['router'] = contracts.router().address
+    address['bridgeImpl']['anyswap']['address'] = contracts.multichain().address
+    address['swapImpl']['zeroex']['address'] = contracts.zeroEx().address
 
     save_addresses(network, address)
 
