@@ -1,15 +1,15 @@
 local:
   bridgeImpl:
     anyswap:
-      address: '0x4E5548E3f4Ba7184Bfb819960212b194e0a27479'
+      address: '0x829cb2786FE9aA677B49F3A6B2fF388031C6d94C'
       code: 0
   bridges:
     anyswap: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
   relayer: '0x167ef146136cfB56E146f041c09a7cD9a438476F'
-  router: '0x7a3d735ee6873f17Dbdcab1d51B604928dc10d92'
+  router: '0x2a3D62721d1812fB0622E6f08E56aED8D81BDF1E'
   swapImpl:
     zeroex:
-      address: '0x033228351384f641B5A11a3371a66D07e74C69AB'
+      address: '0xA205617050bDE4Ae68581D12605FF35B90aE4f5C'
       code: 0
   zeroex: '0xf3080e463C529cB37313d637be6F2f6D369ca86D'
 polygon-main:
