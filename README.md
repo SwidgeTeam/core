@@ -1,44 +1,47 @@
-# Basic Sample Hardhat Project
+# Smart contracts for Swidge
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+This project contains the on-chain code that executes and forwards transactions 
+across a set of different providers.
 
-Try running some of the following tasks:
+### Requirements
 
+- brownie
+- node
+
+### Set up
+Set required networks in the local brownie networks file.
 ```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
+make import
 ```
 
+### Test
+```shell
+yarn test
+```
 
 ### Deploy
-
-- Deploy providers
-
-```shell
-make deploy-<chain>-anyswap
-make deploy-<chain>-zeroex
-```
 
 - Deploy router
 
 ```shell
-make deploy-<chain>-router
+make deploy.router.<chain>
 ```
 
-- Update router address on providers
+- Deploy providers
 
 ```shell
-make update-router-<chain>-anyswap
-make update-router-<chain>-zeroex
+make deploy.anyswap.<chain>
+make deploy.zeroex.<chain>
 ```
 
-- Add new providers on router
+- Verify router
 
 ```shell
-make set-providers
+make verify.router.<chain>
 ```
+
+#### Accepted chains
+
+Look in `.make.cfg` file in the project's root.
+
+
