@@ -1,15 +1,28 @@
+ftm-main:
+  bridgeImpl:
+    anyswap:
+      address: '0x4E5548E3f4Ba7184Bfb819960212b194e0a27479'
+      code: 0
+  bridges:
+    anyswap: '0x1ccca1ce62c62f7be95d4a67722a8fdbed6eecb4'
+  relayer: '0x167ef146136cfB56E146f041c09a7cD9a438476F'
+  router: '0x674afe69ef1994c5f762d018956582Dd396746cd'
+  swapImpl:
+    zeroex:
+      address: '0x033228351384f641B5A11a3371a66D07e74C69AB'
+      code: 0
 local:
   bridgeImpl:
     anyswap:
-      address: '0x829cb2786FE9aA677B49F3A6B2fF388031C6d94C'
+      address: '0xc5F207B66a97F43D042c20e22fC65C992D1707b2'
       code: 0
   bridges:
     anyswap: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
   relayer: '0x167ef146136cfB56E146f041c09a7cD9a438476F'
-  router: '0x2a3D62721d1812fB0622E6f08E56aED8D81BDF1E'
+  router: '0x755B94ECAbFdAd005ebDCe3969B50715021BBCCE'
   swapImpl:
     zeroex:
-      address: '0xA205617050bDE4Ae68581D12605FF35B90aE4f5C'
+      address: '0x96b2D7DfBF45c3666ded89267ead70Fc0f50E8aA'
       code: 0
 polygon-main:
   bridgeImpl:
@@ -19,20 +32,7 @@ polygon-main:
   bridges:
     anyswap: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
   relayer: '0x167ef146136cfB56E146f041c09a7cD9a438476F'
-  router: '0x2a3D62721d1812fB0622E6f08E56aED8D81BDF1E'
-  swapImpl:
-    zeroex:
-      address: '0x033228351384f641B5A11a3371a66D07e74C69AB'
-      code: 0
-ftm-main:
-  bridgeImpl:
-    anyswap:
-      address: '0x4E5548E3f4Ba7184Bfb819960212b194e0a27479'
-      code: 0
-  bridges:
-    anyswap: '0x1ccca1ce62c62f7be95d4a67722a8fdbed6eecb4'
-  relayer: '0x167ef146136cfB56E146f041c09a7cD9a438476F'
-  router: '0x2a3D62721d1812fB0622E6f08E56aED8D81BDF1E'
+  router: '0x674afe69ef1994c5f762d018956582Dd396746cd'
   swapImpl:
     zeroex:
       address: '0x033228351384f641B5A11a3371a66D07e74C69AB'
