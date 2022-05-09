@@ -165,7 +165,7 @@ live:
         name: Testnet
       - chainid: 250
         explorer: https://api.ftmscan.com/api
-        host: https://rpcapi.fantom.network
+        host: https://rpc.ftm.tools/
         id: ftm-main
         name: Mainnet
 
