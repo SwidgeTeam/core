@@ -4,7 +4,7 @@ from scripts.src.accounts import deployer, user, random
 from scripts.src.addresses import load_addresses
 from scripts.src.Contracts import Contracts
 
-from_deployer = {'from': deployer, 'required_confs': 1}
+from_deployer = {'from': deployer, 'required_confs': 2}
 from_user = {'from': user, 'required_confs': 1}
 
 """
