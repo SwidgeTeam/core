@@ -1,4 +1,4 @@
-from brownie import Router, ZeroEx, Anyswap, accounts, config
+from brownie import Router, ZeroEx, Anyswap
 from brownie.network.main import show_active
 
 from scripts.src.accounts import deployer, user, random
@@ -14,7 +14,7 @@ def main(contract):
 
     if contract == 'zeroex':
         # Deploy provider contract
-        zeroEx = deployer.deploy(ZeroEx)
+        zeroEx = ZeroEx.deploy(from_deployer)
         # Update router address on provider
         zeroEx.updateRouter(address['router'], from_deployer)
         # Store new address
@@ -22,7 +22,7 @@ def main(contract):
 
     elif contract == 'multichain':
         # Deploy provider contract
-        multichain = deployer.deploy(Anyswap, address['bridges']['anyswap'])
+        multichain = Anyswap.deploy(address['bridges']['anyswap'], from_deployer)
         # Update router address on provider
         multichain.updateRouter(address['router'], from_deployer)
         # Store new address
@@ -30,7 +30,7 @@ def main(contract):
 
     elif contract == 'router':
         # Deploy router contract
-        router = deployer.deploy(Router)
+        router = Router.deploy(from_deployer)
         # Store new address
         address['router'] = router.address
 

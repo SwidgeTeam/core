@@ -4,8 +4,8 @@ from scripts.src.accounts import deployer, user, random
 from scripts.src.addresses import load_addresses
 from scripts.src.Contracts import Contracts
 
-from_deployer = {'from': deployer}
-from_user = {'from': user}
+from_deployer = {'from': deployer, 'required_confs': 1}
+from_user = {'from': user, 'required_confs': 1}
 
 """
 Deploys the whole set of contracts
@@ -14,9 +14,9 @@ and returns the instances
 def deploy_contracts(network):
     address = load_addresses(network)
 
-    router = deployer.deploy(Router)
-    zeroEx = deployer.deploy(ZeroEx)
-    anyswap = deployer.deploy(Anyswap, address['bridges']['anyswap'])
+    router = Router.deploy(from_deployer)
+    zeroEx = ZeroEx.deploy(from_deployer)
+    anyswap = Anyswap.deploy(address['bridges']['anyswap'], from_deployer)
 
     zeroEx.updateRouter(router.address, from_deployer)
     anyswap.updateRouter(router.address, from_deployer)
