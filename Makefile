@@ -20,9 +20,13 @@ BROWNIE_COMPILE = ${BROWNIE} compile $(1)
 BROWNIE_RUN = ${BROWNIE} run --network $(1) $(2)
 
 BROWNIE_DEPLOY = $(call BROWNIE_RUN, $(2), scripts/tasks/deploy.py main $(1))
+BROWNIE_VERIFY = $(call BROWNIE_RUN, $(1), scripts/tasks/verify-router.py)
 
 $(addprefix deploy., ${DEPLOY_COMMANDS}): deploy.%:
 	@$(call BROWNIE_DEPLOY,$(shell echo $* | cut -d'.' -f 1),$(shell echo $* | cut -d'.' -f 2))
+
+$(addprefix verify.router., ${NETWORKS}): verify.router.%:
+	@$(call BROWNIE_VERIFY,$*)
 
 import:
 	@${call BROWNIE_NETWORKS, import network-config.yaml true}
