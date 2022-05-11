@@ -18,6 +18,7 @@ BROWNIE = brownie
 BROWNIE_NETWORKS = ${BROWNIE} networks $(1)
 BROWNIE_COMPILE = ${BROWNIE} compile $(1)
 BROWNIE_RUN = ${BROWNIE} run --network $(1) $(2)
+BROWNIE_FORK = ${BROWNIE} console --network $(1)
 
 BROWNIE_DEPLOY = $(call BROWNIE_RUN, $(2), scripts/tasks/deploy.py main $(1))
 BROWNIE_VERIFY = $(call BROWNIE_RUN, $(1), scripts/tasks/verify-router.py)
@@ -27,6 +28,9 @@ $(addprefix deploy., ${DEPLOY_COMMANDS}): deploy.%:
 
 $(addprefix verify.router., ${NETWORKS}): verify.router.%:
 	@$(call BROWNIE_VERIFY,$*)
+
+$(addprefix fork., ${NETWORKS}): fork.%:
+	@$(call BROWNIE_FORK,$*-fork)
 
 import:
 	@${call BROWNIE_NETWORKS, import network-config.yaml true}
