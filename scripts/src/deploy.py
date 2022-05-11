@@ -1,10 +1,17 @@
 from brownie import Router, ZeroEx, Anyswap, accounts, Contract
+from brownie.network.main import show_active
 
 from scripts.src.accounts import deployer, user, random
 from scripts.src.addresses import load_addresses
 from scripts.src.Contracts import Contracts
 
-from_deployer = {'from': deployer, 'required_confs': 2}
+network = show_active()
+if '-fork' in network or network == 'local':
+    confirmations = 1
+else:
+    confirmations = 2
+
+from_deployer = {'from': deployer, 'required_confs': confirmations}
 from_user = {'from': user, 'required_confs': 1}
 
 """
