@@ -1,5 +1,6 @@
 from brownie import Router
 from brownie.network.main import show_active
+from brownie.network import gas_price
 
 from scripts.src.deploy import from_deployer
 from scripts.src.addresses import load_addresses
@@ -12,6 +13,8 @@ def main():
     address = load_addresses(network)
 
     router = Router.at(address['router'])
+
+    #gas_price("12000 gwei")
 
     router.updateSwapProvider(
         address['swapImpl']['zeroex']['code'],
