@@ -137,7 +137,7 @@ describe("Router", function () {
             const [owner, anyoneElse] = await ethers.getSigners();
 
             /** Act */
-            const call = contract.connect(anyoneElse).initTokensCross(
+            const call = contract.connect(anyoneElse).initSwidge(
                 1000000,
                 [
                     0,
@@ -188,7 +188,7 @@ describe("Router", function () {
             /** Act */
             const call = contract
                 .connect(anyoneElse)
-                .initTokensCross(
+                .initSwidge(
                     1000000,
                     [
                         0,
@@ -245,7 +245,7 @@ describe("Router", function () {
             /** Act */
             const call = contract
                 .connect(anyoneElse)
-                .initTokensCross(
+                .initSwidge(
                     1000000,
                     [
                         0,
@@ -309,7 +309,7 @@ describe("Router", function () {
             /** Act */
             const call = contract
                 .connect(anyoneElse)
-                .initTokensCross(
+                .initSwidge(
                     1000000,
                     [
                         0,
@@ -359,7 +359,7 @@ describe("Router", function () {
             await contract.connect(owner).updateRelayer(relayer.address);
 
             /** Act */
-            const call = contract.connect(anyoneElse).finalizeTokenCross(
+            const call = contract.connect(anyoneElse).finalizeSwidge(
                 1000000,
                 RandomAddress,
                 [
@@ -405,7 +405,7 @@ describe("Router", function () {
             /** Act */
             const call = contract
                 .connect(relayer)
-                .finalizeTokenCross(
+                .finalizeSwidge(
                     1000000,
                     RandomAddress,
                     [
@@ -460,7 +460,7 @@ describe("Router", function () {
             /** Act */
             const call = contract
                 .connect(relayer)
-                .finalizeTokenCross(
+                .finalizeSwidge(
                     1000000,
                     RandomAddress,
                     [
