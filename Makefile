@@ -22,6 +22,7 @@ BROWNIE_FORK = ${BROWNIE} console --network $(1)
 
 BROWNIE_DEPLOY = $(call BROWNIE_RUN, $(2), scripts/tasks/deploy.py main $(1))
 BROWNIE_VERIFY = $(call BROWNIE_RUN, $(1), scripts/tasks/verify-router.py)
+BROWNIE_RETRIEVE = $(call BROWNIE_RUN, $(1), scripts/tasks/retrieve.py main $(2) $(3))
 
 $(addprefix deploy., ${DEPLOY_COMMANDS}): deploy.%:
 	@$(call BROWNIE_DEPLOY,$(shell echo $* | cut -d'.' -f 1),$(shell echo $* | cut -d'.' -f 2))
@@ -31,6 +32,9 @@ $(addprefix verify.router., ${NETWORKS}): verify.router.%:
 
 $(addprefix fork., ${NETWORKS}): fork.%:
 	@$(call BROWNIE_FORK,$*-fork)
+
+$(addprefix retrieve., ${NETWORKS}): retrieve.%:
+	@$(call BROWNIE_RETRIEVE,$*,$(TOKEN),$(AMOUNT))
 
 import:
 	@${call BROWNIE_NETWORKS, import network-config.yaml true}
