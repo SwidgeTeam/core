@@ -13,8 +13,7 @@ contract Router is Ownable {
     mapping(uint8 => IDEX) private swapProviders;
 
     enum dexCode {
-        Uniswap, // 0
-        ZeroEx // 1
+        ZeroEx // 0
     }
 
     enum bridgeCode {
@@ -87,7 +86,24 @@ contract Router is Ownable {
      * @dev Emitted when a multi-chain swap is initiated
      */
     event CrossInitiated(
-        string txUuid,
+        address srcToken,
+        address bridgeTokenIn,
+        address bridgeTokenOut,
+        address dstToken,
+        uint256 fromChain,
+        uint256 toChain,
+        uint256 amountIn,
+        uint256 amountCross
+    );
+
+    /**
+     * @dev Emitted when a single-chain swap is completed
+     */
+    event SwapExecuted(
+        address srcToken,
+        address dstToken,
+        uint256 chainId,
+        uint256 amountIn,
         uint256 amountOut
     );
 
@@ -95,22 +111,13 @@ contract Router is Ownable {
      * @dev Emitted when a multi-chain swap is finalized
      */
     event CrossFinalized(
-        string txUuid,
-        uint256 amountOut
-    );
-
-    /**
-     * @dev Emitted when a single-chain swap is completed
-     */
-    event SwapExecuted(
-        string txUuid,
         uint256 amountOut
     );
 
     /**
      * @dev Defines the details for the swap step
      */
-    struct SwapData {
+    struct SwapStep {
         uint8 providerCode;
         address tokenIn;
         address tokenOut;
@@ -121,11 +128,19 @@ contract Router is Ownable {
     /**
      * @dev Defines the details for the bridge step
      */
-    struct BridgeData {
+    struct BridgeStep {
         address tokenIn;
         uint256 toChainId;
         bytes data;
         bool required;
+    }
+
+    /**
+     * @dev Defines the details for the destination swap
+     */
+    struct DestinationSwap {
+        address tokenIn;
+        address tokenOut;
     }
 
     /**
@@ -134,20 +149,20 @@ contract Router is Ownable {
      */
     function initSwidge(
         uint256 _amount,
-        SwapData calldata _swapData,
-        BridgeData calldata _bridgeData,
-        string calldata _txUuid
+        SwapStep calldata _swapStep,
+        BridgeStep calldata _bridgeStep,
+        DestinationSwap calldata _destinationSwap
     ) external payable {
         // We need either the swap or the bridge step to be required
-        require(_swapData.required || _bridgeData.required, "No required actions");
+        require(_swapStep.required || _bridgeStep.required, "No required actions");
 
         address tokenToTakeIn;
         // Need to check which token is going to be taken as input
-        if (_swapData.required) {
-            tokenToTakeIn = _swapData.tokenIn;
+        if (_swapStep.required) {
+            tokenToTakeIn = _swapStep.tokenIn;
         }
         else {
-            tokenToTakeIn = _bridgeData.tokenIn;
+            tokenToTakeIn = _bridgeStep.tokenIn;
         }
 
         // Take ownership of user's tokens
@@ -161,23 +176,23 @@ contract Router is Ownable {
         uint256 finalAmount;
         // Store the amount for the next step
         // depending on the step to take
-        if (_swapData.required) {
-            IDEX swapper = swapProviders[_swapData.providerCode];
+        if (_swapStep.required) {
+            IDEX swapper = swapProviders[_swapStep.providerCode];
 
             // Approve swapper contract
             TransferHelper.safeApprove(
-                _swapData.tokenIn,
+                _swapStep.tokenIn,
                 address(swapper),
                 _amount
             );
 
             // Execute the swap
             finalAmount = swapper.swap{value : msg.value}(
-                _swapData.tokenIn,
-                _swapData.tokenOut,
+                _swapStep.tokenIn,
+                _swapStep.tokenOut,
                 address(this),
                 _amount,
-                _swapData.data
+                _swapStep.data
             );
         }
         else {
@@ -186,34 +201,49 @@ contract Router is Ownable {
             finalAmount = _amount;
         }
 
-        if (_bridgeData.required) {
+        if (_bridgeStep.required) {
             // Load selected bridge provider
             IBridge bridge = bridgeProviders[uint8(bridgeCode.Anyswap)];
 
             // Approve tokens for the bridge to take
             TransferHelper.safeApprove(
-                _bridgeData.tokenIn,
+                _bridgeStep.tokenIn,
                 address(bridge),
                 finalAmount
             );
 
             // Execute bridge process
             bridge.send(
-                _bridgeData.tokenIn,
+                _bridgeStep.tokenIn,
                 address(this),
                 finalAmount,
-                _bridgeData.toChainId,
-                _bridgeData.data
+                _bridgeStep.toChainId,
+                _bridgeStep.data
             );
 
             // Emit event for relayer
-            emit CrossInitiated(_txUuid, finalAmount);
+            emit CrossInitiated(
+                _swapStep.tokenIn,
+                _bridgeStep.tokenIn,
+                _destinationSwap.tokenIn,
+                _destinationSwap.tokenOut,
+                block.chainid,
+                _bridgeStep.toChainId,
+                _amount,
+                finalAmount
+            );
         }
         else {
             // Bridging is not required, means we are not changing network
             // so we send the assets back to the user
-            TransferHelper.safeTransfer(_swapData.tokenOut, msg.sender, finalAmount);
-            emit SwapExecuted(_txUuid, finalAmount);
+            TransferHelper.safeTransfer(_swapStep.tokenOut, msg.sender, finalAmount);
+            emit SwapExecuted(
+                _swapStep.tokenIn,
+                _swapStep.tokenOut,
+                block.chainid,
+                _amount,
+                finalAmount
+            );
         }
     }
 
@@ -225,34 +255,33 @@ contract Router is Ownable {
     function finalizeSwidge(
         uint256 _amount,
         address _receiver,
-        SwapData calldata _swapData,
-        string calldata _txUuid
+        SwapStep calldata _swapStep
     ) external payable onlyRelayer {
-        IDEX swapper = swapProviders[_swapData.providerCode];
+        IDEX swapper = swapProviders[_swapStep.providerCode];
 
         // Approve swapper contract
         TransferHelper.safeApprove(
-            _swapData.tokenIn,
+            _swapStep.tokenIn,
             address(swapper),
             _amount
         );
 
         uint256 boughtAmount = swapper.swap{value : msg.value}(
-            _swapData.tokenIn,
-            _swapData.tokenOut,
+            _swapStep.tokenIn,
+            _swapStep.tokenOut,
             address(this),
             _amount,
-            _swapData.data
+            _swapStep.data
         );
 
         // Send tokens to the user
         TransferHelper.safeTransfer(
-            _swapData.tokenOut,
+            _swapStep.tokenOut,
             _receiver,
             boughtAmount
         );
 
-        emit CrossFinalized(_txUuid, boughtAmount);
+        emit CrossFinalized(boughtAmount);
     }
 
     /// To retrieve any tokens that got stuck on the contract
