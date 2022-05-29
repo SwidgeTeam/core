@@ -152,7 +152,10 @@ describe("Router", function () {
                     '0x',
                     false
                 ],
-                'txUuid'
+                [
+                    RandomAddress,
+                    RandomAddress,
+                ]
             );
 
             /** Assert */
@@ -203,13 +206,22 @@ describe("Router", function () {
                         '0x',
                         false
                     ],
-                    'txUuid'
+                    [
+                        RandomAddress,
+                        RandomAddress,
+                    ]
                 );
 
             /** Assert */
             await expect(call)
                 .to.emit(contract, 'SwapExecuted')
-                .withArgs('txUuid', 10);
+                .withArgs(
+                    fakeTokenIn.address,
+                    fakeTokenOut.address,
+                    31337,
+                    1000000,
+                    10
+                );
 
             await expect(mockZeroExContract.swap)
                 .to.be.calledOnceWith(
@@ -260,13 +272,25 @@ describe("Router", function () {
                         callData,
                         true
                     ],
-                    'txUuid'
+                    [
+                        RandomAddress,
+                        RandomAddress,
+                    ]
                 );
 
             /** Assert */
             await expect(call)
                 .to.emit(contract, 'CrossInitiated')
-                .withArgs('txUuid', 1000000);
+                .withArgs(
+                    RandomAddress,
+                    fakeTokenIn.address,
+                    RandomAddress,
+                    RandomAddress,
+                    31337,
+                    1337,
+                    1000000,
+                    1000000
+                );
 
             await expect(mockAnyswapContract.send)
                 .to.be.calledOnceWith(
@@ -324,13 +348,25 @@ describe("Router", function () {
                         callDataBridge,
                         true
                     ],
-                    'txUuid'
+                    [
+                        RandomAddress,
+                        RandomAddress,
+                    ]
                 );
 
             /** Assert */
             await expect(call)
                 .to.emit(contract, 'CrossInitiated')
-                .withArgs('txUuid', 10);
+                .withArgs(
+                    fakeTokenIn.address,
+                    fakeTokenOut.address,
+                    RandomAddress,
+                    RandomAddress,
+                    31337,
+                    1337,
+                    1000000,
+                    10
+                );
 
             await expect(mockZeroExContract.swap)
                 .to.be.calledOnceWith(
@@ -369,7 +405,6 @@ describe("Router", function () {
                     '0x',
                     false
                 ],
-                'txUuid'
             );
 
             /** Assert */
@@ -415,13 +450,12 @@ describe("Router", function () {
                         callData,
                         true
                     ],
-                    'txUuid'
                 );
 
             /** Assert */
             await expect(call)
                 .to.emit(contract, 'CrossFinalized')
-                .withArgs('txUuid', 10);
+                .withArgs(10);
 
             await expect(mockZeroExContract.swap)
                 .to.be.calledOnceWith(
@@ -470,7 +504,6 @@ describe("Router", function () {
                         callData,
                         true
                     ],
-                    'txUuid'
                 );
 
             /** Assert */

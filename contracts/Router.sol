@@ -29,36 +29,6 @@ contract Router is Ownable {
     }
 
     /**
-     * @dev Updates the address of a bridge provider contract
-     */
-    function updateBridgeProvider(bridgeCode _code, address _address) external onlyOwner {
-        require(_address != address(0), 'ZeroAddress not allowed');
-        uint8 code = uint8(_code);
-        bridgeProviders[code] = IBridge(_address);
-        emit UpdatedBridgeProvider(code, _address);
-    }
-
-    /**
-     * @dev Updates the address of a swap provider contract
-     */
-    function updateSwapProvider(dexCode _code, address _address) external onlyOwner {
-        require(_address != address(0), 'ZeroAddress not allowed');
-        uint8 code = uint8(_code);
-        swapProviders[code] = IDEX(_address);
-        emit UpdatedSwapProvider(code, _address);
-    }
-
-    /**
-     * @dev Updates the address of the authorized relayer
-     */
-    function updateRelayer(address _relayerAddress) external onlyOwner {
-        require(_relayerAddress != address(0), 'ZeroAddress not allowed');
-        address oldAddress = relayerAddress;
-        relayerAddress = _relayerAddress;
-        emit UpdatedRelayer(oldAddress, relayerAddress);
-    }
-
-    /**
      * @dev Emitted when a bridge provider address is updated
      */
     event UpdatedBridgeProvider(
@@ -237,6 +207,8 @@ contract Router is Ownable {
             // Bridging is not required, means we are not changing network
             // so we send the assets back to the user
             TransferHelper.safeTransfer(_swapStep.tokenOut, msg.sender, finalAmount);
+            // We surely did a swap,
+            // so in this case we inform of it
             emit SwapExecuted(
                 _swapStep.tokenIn,
                 _swapStep.tokenOut,
@@ -284,7 +256,39 @@ contract Router is Ownable {
         emit CrossFinalized(boughtAmount);
     }
 
-    /// To retrieve any tokens that got stuck on the contract
+    /**
+     * @dev Updates the address of a bridge provider contract
+     */
+    function updateBridgeProvider(bridgeCode _code, address _address) external onlyOwner {
+        require(_address != address(0), 'ZeroAddress not allowed');
+        uint8 code = uint8(_code);
+        bridgeProviders[code] = IBridge(_address);
+        emit UpdatedBridgeProvider(code, _address);
+    }
+
+    /**
+     * @dev Updates the address of a swap provider contract
+     */
+    function updateSwapProvider(dexCode _code, address _address) external onlyOwner {
+        require(_address != address(0), 'ZeroAddress not allowed');
+        uint8 code = uint8(_code);
+        swapProviders[code] = IDEX(_address);
+        emit UpdatedSwapProvider(code, _address);
+    }
+
+    /**
+     * @dev Updates the address of the authorized relayer
+     */
+    function updateRelayer(address _relayerAddress) external onlyOwner {
+        require(_relayerAddress != address(0), 'ZeroAddress not allowed');
+        address oldAddress = relayerAddress;
+        relayerAddress = _relayerAddress;
+        emit UpdatedRelayer(oldAddress, relayerAddress);
+    }
+
+    /**
+     * @dev To retrieve any tokens that got stuck on the contract
+     */
     function retrieve(address _token, uint256 _amount) external onlyOwner {
         TransferHelper.safeTransfer(_token, msg.sender, _amount);
     }
