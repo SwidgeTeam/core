@@ -3,7 +3,7 @@ from brownie.network.main import show_active
 
 from scripts.src.addresses import load_addresses
 from scripts.src.deploy import from_deployer, from_user
-from scripts.src.accounts import user, random
+from scripts.src.accounts import user
 from scripts.src.tokens import load_tokens, transfer_tokens_to
 
 """
@@ -25,7 +25,7 @@ def main():
 
     tx = router.finalizeSwidge(
         amount,
-        random.address,
+        user.address,
         [
             0,
             tokens['usdc']['address'],

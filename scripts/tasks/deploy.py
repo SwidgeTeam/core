@@ -2,8 +2,6 @@ from brownie import Router, ZeroEx, Anyswap
 from brownie.network.main import show_active
 from brownie.network import gas_price
 
-
-from scripts.src.accounts import deployer, user, random
 from scripts.src.addresses import save_addresses, load_addresses
 from scripts.src.deploy import from_deployer
 

@@ -1,7 +1,7 @@
-from brownie import Router, ZeroEx, Anyswap, accounts, Contract
+from brownie import Router, ZeroEx, Anyswap
 from brownie.network.main import show_active
 
-from scripts.src.accounts import deployer, user, random
+from scripts.src.accounts import deployer, relayer, user
 from scripts.src.addresses import load_addresses
 from scripts.src.Contracts import Contracts
 
@@ -38,7 +38,7 @@ def deploy_contracts(network):
         anyswap.address,
         from_deployer)
 
-    router.updateRelayer(router.address, from_deployer)
+    router.updateRelayer(relayer, from_deployer)
 
     return Contracts(
         router=router,

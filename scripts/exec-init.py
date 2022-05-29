@@ -1,10 +1,9 @@
 from brownie import Router
 from brownie.network.main import show_active
 
-from scripts.src.deploy import deploy_contracts, from_deployer, from_user
-from scripts.src.accounts import random
+from scripts.src.accounts import user
 from scripts.src.addresses import load_addresses
-from scripts.src.tokens import load_tokens, transfer_tokens_to, approve_tokens_to
+from scripts.src.tokens import load_tokens, approve_tokens_to
 
 """
 Executes the function initTokenCross from Router
@@ -22,7 +21,7 @@ def main():
     # Approve the contract to take the tokens
     approve_tokens_to(
         token_address=tokens['link']['address'],
-        from_address=random.address,
+        from_address=user.address,
         to_address=address['router'],
         amount=amount)
 
@@ -44,6 +43,6 @@ def main():
             True
         ],
         'random-uuid',
-        {'from': random, 'required_confs': 1})
+        {'from': user, 'required_confs': 1})
 
     print(tx.info())
