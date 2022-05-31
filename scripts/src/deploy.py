@@ -38,7 +38,7 @@ def deploy_contracts(network):
         anyswap.address,
         from_deployer)
 
-    router.updateRelayer(relayer, from_deployer)
+    router.updateRelayer(relayer.address, from_deployer)
 
     return Contracts(
         router=router,

@@ -10,4 +10,4 @@ def main(token, receiver):
         token_address=tokens[token]['address'],
         from_address=tokens[token]['holder'],
         to_address=receiver,
-        amount=10000000000000000000)
+        amount=100000000000000000000)

@@ -1,6 +1,7 @@
 from brownie import Router
 from brownie.network.main import show_active
 
+from scripts.src.accounts import relayer
 from scripts.src.deploy import from_deployer
 from scripts.src.addresses import load_addresses
 
@@ -14,5 +15,5 @@ def main():
     router = Router.at(address['router'])
 
     router.updateRelayer(
-        address['relayer'],
+        relayer.address,
         from_deployer)
