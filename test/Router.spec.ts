@@ -398,6 +398,7 @@ describe("Router", function () {
             const call = contract.connect(anyoneElse).finalizeSwidge(
                 1000000,
                 RandomAddress,
+                'txHash',
                 [
                     1,
                     RandomAddress,
@@ -443,6 +444,7 @@ describe("Router", function () {
                 .finalizeSwidge(
                     1000000,
                     RandomAddress,
+                    'txHash',
                     [
                         0,
                         fakeTokenIn.address,
@@ -455,7 +457,7 @@ describe("Router", function () {
             /** Assert */
             await expect(call)
                 .to.emit(contract, 'CrossFinalized')
-                .withArgs(10);
+                .withArgs('txHash', 10);
 
             await expect(mockZeroExContract.swap)
                 .to.be.calledOnceWith(

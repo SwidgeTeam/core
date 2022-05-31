@@ -81,6 +81,7 @@ contract Router is Ownable {
      * @dev Emitted when a multi-chain swap is finalized
      */
     event CrossFinalized(
+        string txHash,
         uint256 amountOut
     );
 
@@ -219,7 +220,6 @@ contract Router is Ownable {
         }
     }
 
-
     /**
      * Finalize the process of swidging
      * @dev This function is executed on the destination chain
@@ -227,6 +227,7 @@ contract Router is Ownable {
     function finalizeSwidge(
         uint256 _amount,
         address _receiver,
+        string calldata _originHash,
         SwapStep calldata _swapStep
     ) external payable onlyRelayer {
         IDEX swapper = swapProviders[_swapStep.providerCode];
@@ -253,7 +254,7 @@ contract Router is Ownable {
             boughtAmount
         );
 
-        emit CrossFinalized(boughtAmount);
+        emit CrossFinalized(_originHash, boughtAmount);
     }
 
     /**
