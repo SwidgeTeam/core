@@ -1,4 +1,4 @@
-ftm-main:
+fantom:
   bridgeImpl:
     anyswap:
       address: '0x459ff9C25E80b68BB6d0362d275c53586B2497C3'
@@ -24,7 +24,7 @@ local:
     zeroex:
       address: '0x96b2D7DfBF45c3666ded89267ead70Fc0f50E8aA'
       code: 0
-polygon-main:
+polygon:
   bridgeImpl:
     anyswap:
       address: '0x459ff9C25E80b68BB6d0362d275c53586B2497C3'

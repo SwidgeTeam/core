@@ -23,12 +23,12 @@ development:
     cmd_settings:
       accounts: 10
       evm_version: istanbul
-      fork: bsc-main
+      fork: bsc
       gas_limit: 12000000
       mnemonic: brownie
       port: 8545
     host: http://127.0.0.1
-    id: bsc-main-fork
+    id: bsc-fork
     name: Ganache-CLI (BSC-Mainnet Fork)
     timeout: 120
 
@@ -36,12 +36,12 @@ development:
     cmd_settings:
       accounts: 10
       evm_version: istanbul
-      fork: ftm-main
+      fork: fantom
       gas_limit: 12000000
       mnemonic: brownie
       port: 8545
     host: http://127.0.0.1
-    id: ftm-main-fork
+    id: fantom-fork
     name: Ganache-CLI (FTM-Mainnet Fork)
     timeout: 120
 
@@ -49,12 +49,12 @@ development:
     cmd_settings:
       accounts: 10
       evm_version: istanbul
-      fork: polygon-main
+      fork: polygon
       gas_limit: 20000000
       mnemonic: brownie
       port: 8545
     host: http://127.0.0.1
-    id: polygon-main-fork
+    id: polygon-fork
     name: Ganache-CLI (Polygon-Mainnet Fork)
     timeout: 120
 
@@ -62,12 +62,12 @@ development:
     cmd_settings:
       accounts: 10
       evm_version: istanbul
-      fork: xdai-main
+      fork: xdai
       gas_limit: 20000000
       mnemonic: brownie
       port: 8545
     host: http://127.0.0.1
-    id: xdai-main-fork
+    id: xdai-fork
     name: Ganache-CLI (XDai-Mainnet Fork)
     timeout: 120
 
@@ -75,12 +75,12 @@ development:
     cmd_settings:
       accounts: 10
       evm_version: istanbul
-      fork: avax-main
+      fork: avax
       gas_limit: 20000000
       mnemonic: brownie
       port: 8545
     host: http://127.0.0.1
-    id: avax-main-fork
+    id: avax-fork
     name: Ganache-CLI (Avax-Mainnet Fork)
     timeout: 120
 
@@ -136,7 +136,7 @@ live:
       - chainid: 43114
         explorer: https://api.snowtrace.io/api
         host: https://api.avax.network/ext/bc/C/rpc
-        id: avax-main
+        id: avax
         name: Mainnet
       - chainid: 43113
         host: https://api.avax-test.network/ext/bc/C/rpc
@@ -153,7 +153,7 @@ live:
       - chainid: 56
         explorer: https://api.bscscan.com/api
         host: https://bsc-dataseed.binance.org
-        id: bsc-main
+        id: bsc
         name: Mainnet
 
   - name: Fantom Opera
@@ -161,19 +161,19 @@ live:
       - chainid: 4002
         explorer: https://explorer.testnet.fantom.network
         host: https://rpc.testnet.fantom.network
-        id: ftm-test
+        id: fantom-test
         name: Testnet
       - chainid: 250
         explorer: https://api.ftmscan.com/api
         host: https://rpc.ftm.tools/
-        id: ftm-main
+        id: fantom
         name: Mainnet
 
   - name: Harmony
     networks:
       - chainid: 1666600000
         host: https://api.harmony.one
-        id: harmony-main
+        id: harmony
         multicall2: '0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb'
         name: Mainnet (Shard 0)
 
@@ -182,7 +182,7 @@ live:
       - chainid: 137
         explorer: https://api.polygonscan.com/api
         host: https://polygon-mainnet.g.alchemy.com/v2/${POLYGON_MAINNET_ALCHEMY_KEY}
-        id: polygon-main
+        id: polygon
         multicall2: '0xc8E51042792d7405184DfCa245F2d27B94D013b6'
         name: Mainnet (Alchemy)
       - chainid: 80001
@@ -197,7 +197,7 @@ live:
       - chainid: 100
         explorer: https://blockscout.com/xdai/mainnet/api
         host: https://xdai.poanetwork.dev
-        id: xdai-main
+        id: xdai
         name: Mainnet
       - chainid: 77
         explorer: https://blockscout.com/poa/sokol/api
