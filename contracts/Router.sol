@@ -159,7 +159,7 @@ contract Router is Ownable {
                 valueToSend = _amount;
             }
             else {
-                valueToSend = 0;
+                valueToSend = msg.value;
                 // Approve swapper contract
                 TransferHelper.safeApprove(
                     _swapStep.tokenIn,
@@ -218,7 +218,12 @@ contract Router is Ownable {
         else {
             // Bridging is not required, means we are not changing network
             // so we send the assets back to the user
-            TransferHelper.safeTransfer(_swapStep.tokenOut, msg.sender, finalAmount);
+            if (_swapStep.tokenOut == NATIVE_TOKEN_ADDRESS) {
+                payable(msg.sender).transfer(finalAmount);
+            }
+            else {
+                TransferHelper.safeTransfer(_swapStep.tokenOut, msg.sender, finalAmount);
+            }
             // We surely did a swap,
             // so in this case we inform of it
             emit SwapExecuted(
@@ -250,7 +255,7 @@ contract Router is Ownable {
             _amount
         );
 
-        uint256 boughtAmount = swapper.swap{value : msg.value}(
+        uint256 boughtAmount = swapper.swap(
             _swapStep.tokenIn,
             _swapStep.tokenOut,
             address(this),
@@ -258,12 +263,18 @@ contract Router is Ownable {
             _swapStep.data
         );
 
-        // Send tokens to the user
-        TransferHelper.safeTransfer(
-            _swapStep.tokenOut,
-            _receiver,
-            boughtAmount
-        );
+        if (_swapStep.tokenOut == NATIVE_TOKEN_ADDRESS) {
+            // Sent native coins
+            payable(_receiver).transfer(boughtAmount);
+        }
+        else {
+            // Send tokens to the user
+            TransferHelper.safeTransfer(
+                _swapStep.tokenOut,
+                _receiver,
+                boughtAmount
+            );
+        }
 
         emit CrossFinalized(_originHash, boughtAmount);
     }

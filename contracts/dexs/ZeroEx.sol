@@ -26,21 +26,38 @@ contract ZeroEx is IDEX {
             valueToSend = _amountIn;
         }
         else {
+            valueToSend = msg.value;
             // Take the tokens from the router
             TransferHelper.safeTransferFrom(_tokenIn, _router, address(this), _amountIn);
             // Approve tokens to the provider contract
             TransferHelper.safeApprove(_tokenIn, callAddress, _amountIn);
         }
 
+        bool isNativeOut = _tokenOut == NATIVE_TOKEN_ADDRESS;
+        // Depending if its native coin OR token,
+        // we compute the boughtAmount different
+        if (isNativeOut) {
+            boughtAmount = address(this).balance;
+        }
+        else {
+            boughtAmount = IERC20(_tokenOut).balanceOf(address(this));
+        }
 
         // Execute swap with ZeroEx and compute final `boughtAmount`
-        boughtAmount = IERC20(_tokenOut).balanceOf(address(this));
         (bool success,) = callAddress.call{value : valueToSend}(callData);
         require(success, "SWAP FAILED");
-        boughtAmount = IERC20(_tokenOut).balanceOf(address(this)) - boughtAmount;
 
-        // Send tokens back to the router
-        TransferHelper.safeTransfer(_tokenOut, _router, boughtAmount);
+        if (isNativeOut) {
+            boughtAmount = address(this).balance - boughtAmount;
+            // Send coins back to the router
+            payable(_router).transfer(boughtAmount);
+        }
+        else {
+            boughtAmount = IERC20(_tokenOut).balanceOf(address(this)) - boughtAmount;
+            // Send tokens back to the router
+            TransferHelper.safeTransfer(_tokenOut, _router, boughtAmount);
+        }
+
     }
 
 }
