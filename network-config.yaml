@@ -39,7 +39,7 @@ development:
       fork: fantom
       gas_limit: 12000000
       mnemonic: brownie
-      port: 8545
+      port: 8546
     host: http://127.0.0.1
     id: fantom-fork
     name: Ganache-CLI (FTM-Mainnet Fork)
