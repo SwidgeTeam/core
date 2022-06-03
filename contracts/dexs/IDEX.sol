@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "../Provider.sol";
 
 abstract contract IDEX is Provider {
+    address public NATIVE_TOKEN_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     function swap(
         address _tokenIn,
         address _tokenOut,

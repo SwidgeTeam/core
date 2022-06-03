@@ -8,6 +8,7 @@ import "./dexs/IDEX.sol";
 import "./bridge/IBridge.sol";
 
 contract Router is Ownable {
+    address private NATIVE_TOKEN_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     address private relayerAddress;
     mapping(uint8 => IBridge) private bridgeProviders;
     mapping(uint8 => IDEX) private swapProviders;
@@ -136,13 +137,15 @@ contract Router is Ownable {
             tokenToTakeIn = _bridgeStep.tokenIn;
         }
 
-        // Take ownership of user's tokens
-        TransferHelper.safeTransferFrom(
-            tokenToTakeIn,
-            msg.sender,
-            address(this),
-            _amount
-        );
+        if (tokenToTakeIn != NATIVE_TOKEN_ADDRESS) {
+            // Take ownership of user's tokens
+            TransferHelper.safeTransferFrom(
+                tokenToTakeIn,
+                msg.sender,
+                address(this),
+                _amount
+            );
+        }
 
         uint256 finalAmount;
         // Store the amount for the next step
@@ -150,15 +153,23 @@ contract Router is Ownable {
         if (_swapStep.required) {
             IDEX swapper = swapProviders[_swapStep.providerCode];
 
-            // Approve swapper contract
-            TransferHelper.safeApprove(
-                _swapStep.tokenIn,
-                address(swapper),
-                _amount
-            );
+            uint256 valueToSend;
+            // Check the native coins value that we have to forward to the swap impl
+            if (_swapStep.tokenIn == NATIVE_TOKEN_ADDRESS) {
+                valueToSend = _amount;
+            }
+            else {
+                valueToSend = 0;
+                // Approve swapper contract
+                TransferHelper.safeApprove(
+                    _swapStep.tokenIn,
+                    address(swapper),
+                    _amount
+                );
+            }
 
             // Execute the swap
-            finalAmount = swapper.swap{value : msg.value}(
+            finalAmount = swapper.swap{value : valueToSend}(
                 _swapStep.tokenIn,
                 _swapStep.tokenOut,
                 address(this),
