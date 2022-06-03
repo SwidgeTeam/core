@@ -57,7 +57,5 @@ contract ZeroEx is IDEX {
             // Send tokens back to the router
             TransferHelper.safeTransfer(_tokenOut, _router, boughtAmount);
         }
-
     }
-
 }

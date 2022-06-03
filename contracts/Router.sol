@@ -292,7 +292,7 @@ contract Router is Ownable {
     /**
      * @dev Updates the address of a swap provider contract
      */
-    function updateSwapProvider(dexCode _code, address _address) external onlyOwner {
+    function updateSwapProvider(dexCode _code, address payable _address) external onlyOwner {
         require(_address != address(0), 'ZeroAddress not allowed');
         uint8 code = uint8(_code);
         swapProviders[code] = IDEX(_address);
@@ -315,4 +315,9 @@ contract Router is Ownable {
     function retrieve(address _token, uint256 _amount) external onlyOwner {
         TransferHelper.safeTransfer(_token, msg.sender, _amount);
     }
+
+    /**
+     * To allow this contract to receive natives from the swapper impl
+     */
+    receive() external payable {}
 }
