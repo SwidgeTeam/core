@@ -246,37 +246,46 @@ contract Router is Ownable {
         string calldata _originHash,
         SwapStep calldata _swapStep
     ) external payable onlyRelayer {
-        IDEX swapper = swapProviders[_swapStep.providerCode];
 
-        // Approve swapper contract
-        TransferHelper.safeApprove(
-            _swapStep.tokenIn,
-            address(swapper),
-            _amount
-        );
+        uint256 finalAmount;
+        // Check if last swap is required,
+        // and store final user-reaching amount
+        if (_swapStep.required) {
+            IDEX swapper = swapProviders[_swapStep.providerCode];
 
-        uint256 boughtAmount = swapper.swap(
-            _swapStep.tokenIn,
-            _swapStep.tokenOut,
-            address(this),
-            _amount,
-            _swapStep.data
-        );
+            // Approve swapper contract
+            TransferHelper.safeApprove(
+                _swapStep.tokenIn,
+                address(swapper),
+                _amount
+            );
+
+            finalAmount = swapper.swap(
+                _swapStep.tokenIn,
+                _swapStep.tokenOut,
+                address(this),
+                _amount,
+                _swapStep.data
+            );
+        }
+        else {
+            finalAmount = _amount;
+        }
 
         if (_swapStep.tokenOut == NATIVE_TOKEN_ADDRESS) {
             // Sent native coins
-            payable(_receiver).transfer(boughtAmount);
+            payable(_receiver).transfer(finalAmount);
         }
         else {
             // Send tokens to the user
             TransferHelper.safeTransfer(
                 _swapStep.tokenOut,
                 _receiver,
-                boughtAmount
+                finalAmount
             );
         }
 
-        emit CrossFinalized(_originHash, boughtAmount);
+        emit CrossFinalized(_originHash, finalAmount);
     }
 
     /**
