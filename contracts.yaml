@@ -1,14 +1,14 @@
 fantom:
   bridgeImpl:
     anyswap:
-      address: '0x0debed7ab73d74fCBcE38D6FdB9c5316b71FfccE'
+      address: '0xaf5259C18498938B796ee635EaFC0b2F3576b642'
       code: 0
   bridges:
     anyswap: '0x1ccca1ce62c62f7be95d4a67722a8fdbed6eecb4'
-  router: '0x2e4ABC361513Ad7e898dEf245e5E872Dd1db95c4'
+  router: '0x899bD710b6Df7dC93F01CdE499f8Aee0Fcc61c2a'
   swapImpl:
     zeroex:
-      address: '0x1Ea1e04aA090A2C144c9E798AAFbF74D16809bF9'
+      address: '0x4240Bf98a20a25484Ce842e48829441f6F253eaa'
       code: 0
 local:
   bridgeImpl:
@@ -25,12 +25,12 @@ local:
 polygon:
   bridgeImpl:
     anyswap:
-      address: '0x0debed7ab73d74fCBcE38D6FdB9c5316b71FfccE'
+      address: '0xaf5259C18498938B796ee635EaFC0b2F3576b642'
       code: 0
   bridges:
     anyswap: '0x4f3aff3a747fcade12598081e80c6605a8be192f'
-  router: '0x2e4ABC361513Ad7e898dEf245e5E872Dd1db95c4'
+  router: '0x899bD710b6Df7dC93F01CdE499f8Aee0Fcc61c2a'
   swapImpl:
     zeroex:
-      address: '0x1Ea1e04aA090A2C144c9E798AAFbF74D16809bF9'
+      address: '0x4240Bf98a20a25484Ce842e48829441f6F253eaa'
       code: 0
