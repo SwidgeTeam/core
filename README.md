@@ -1,3 +1,5 @@
+[ Project merged into [Swidge monorepo](https://github.com/SwidgeTeam/swidge) ]
+
 # Smart contracts for Swidge
 
 This project contains the on-chain code that executes and forwards transactions 
